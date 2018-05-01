@@ -3,6 +3,7 @@ There are two ways to authenticate a request:
 * Present the session cookie returned after logging in
 * Send a Google access token as the access_token query parameter
 """
+import os  # TODO: factor out
 from flask import (abort, Blueprint, current_app, flash, redirect,
                    render_template, request, session, url_for, jsonify)
 from flask_oauthlib.client import OAuth, OAuthException
@@ -33,7 +34,9 @@ def record_params(setup_state):
     oauth.init_app(app)
 
 oauth = OAuth()
-google_auth = oauth.remote_app(
+# TODO: need some conditional to either add 1 or at runtime choose 1.
+# TODO: both Google and Microsoft should be moved to ./settings to they are in app.config for flask app
+google_auth_old = oauth.remote_app(
     'google',
     app_key='GOOGLE',
     request_token_params={
@@ -46,7 +49,24 @@ google_auth = oauth.remote_app(
     access_token_url='https://accounts.google.com/o/oauth2/token',
     authorize_url='https://accounts.google.com/o/oauth2/auth',
 )
+ 
+# TODO: rename as microsoft_auth
+google_auth = oauth.remote_app(
+	'microsoft',
+    app_key='MICROSOFT',
+	consumer_key=os.getenv('OAUTH_ID'), # TODO: could be env MICROSOFT_ID
+	consumer_secret=os.getenv('OAUTH_SECRET'), # TODO: could be env MICROSOFT_SECRET
+	request_token_params={
+        'scope': 'email'
+    },
+	base_url='http://ignore',  # We won't need this
+	request_token_url=None,
+	access_token_method='POST',
+	access_token_url='https://login.microsoftonline.com/ab1fb3c5-c204-46a9-90c1-eee1acccd5ba/oauth2/token',
+	authorize_url='https://login.microsoftonline.com/ab1fb3c5-c204-46a9-90c1-eee1acccd5ba/oauth2/authorize'
+)
 
+# TODO: what to do about functions named google_ etc.  like in Passport they are a "strategy" to deserial;ize, workl with,etc.
 @google_auth.tokengetter
 def google_oauth_token(token=None):
     return session.get('google_token')
@@ -87,6 +107,7 @@ def google_user_data(token, timeout=5):
     if not token:
         logger.info("Google Token is None")
         return None
+    # TODO: fix this shawn
     google_plus_endpoint = "https://www.googleapis.com/plus/v1/people/me?access_token={}"
 
     try:

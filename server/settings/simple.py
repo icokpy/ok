@@ -68,10 +68,14 @@ except KeyError:
     sys.exit(1)
 
 # Service Keys
-
+# TODO put the rest of the google OAuth settings here that are now in Auth.py
 GOOGLE = {
     'consumer_key': os.environ.get('GOOGLE_ID'),
     'consumer_secret':  os.environ.get('GOOGLE_SECRET')
+}
+
+MICROSOFT = {
+    # TODO: add the stuff from Authy.py that is hacked in and remove from Auth.py.
 }
 
 SENDGRID_AUTH = {
