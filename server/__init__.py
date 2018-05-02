@@ -1,5 +1,6 @@
 import os
 
+from applicationinsights.requests import WSGIApplication
 from flask import Flask, render_template, g, request
 from flask_rq import RQ
 from webassets.loaders import PythonLoader as PythonAssetsLoader
@@ -37,6 +38,10 @@ def create_app(default_config_path=None):
     """
 
     app = Flask(__name__)
+
+    appinsights_key = os.getenv('APPLICATION_INSIGHTS_KEY')
+    if appinsights_key:
+        app.wsgi_app = WSGIApplication(appinsights_key, app.wsgi_app)
 
     config_path = os.getenv('OK_SERVER_CONFIG', default_config_path)
     if config_path is None:
