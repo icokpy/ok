@@ -10,6 +10,7 @@ ENV = 'simple'
 PREFERRED_URL_SCHEME = 'http'
 
 SECRET_KEY = os.getenv('SECRET_KEY')
+OAUTH_PROVIDER='NotSet'
 
 DEBUG = False
 ASSETS_DEBUG = False
@@ -60,23 +61,73 @@ STORAGE_CONTAINER = os.path.abspath("./local-storage")
 
 if not os.path.exists(STORAGE_CONTAINER):
     os.makedirs(STORAGE_CONTAINER)
-try:
-    os.environ["GOOGLE_ID"]
-    os.environ["GOOGLE_SECRET"]
-except KeyError:
-    print("Please set the google login variables.")
-    sys.exit(1)
 
+
+def try_google_oauth():
+    print('inside the google check..')
+    try:
+        os.environ["GOOGLE_ID"]
+        os.environ["GOOGLE_SECRET"]
+        return True
+    except KeyError:
+        print("Please set the google login variables.")
+        return False
+        
+
+def try_microsoft_oauth():
+    print('inside the microsoft check..')
+    try:
+        os.environ["MICROSOFT_APP_ID"]
+        os.environ["MICROSOFT_APP_SECRET"]
+        return True
+    except KeyError:
+        print("Please set the microsoft app ID and Secret variables.")
+        return False
+
+
+from flask_oauthlib.client import OAuth, OAuthException
+oauth = OAuth()
+
+if try_google_oauth():
+    OAUTH_PROVIDER=oauth.remote_app('google', app_key = 'GOOGLE')
+    pass
+elif try_microsoft_oauth():
+    OAUTH_PROVIDER=oauth.remote_app('microsoft', app_key = 'MICROSOFT')
+    pass
+else:
+    sys.exit(1)
+        
 # Service Keys
 # TODO put the rest of the google OAuth settings here that are now in Auth.py
-GOOGLE = {
-    'consumer_key': os.environ.get('GOOGLE_ID'),
-    'consumer_secret':  os.environ.get('GOOGLE_SECRET')
-}
+GOOGLE = dict(
+    consumer_key=os.environ.get('GOOGLE_ID'),
+    consumer_secret=os.environ.get('GOOGLE_SECRET'),
+    base_url='https://www.googleapis.com/oauth2/v3/',
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+    request_token_params={
+        'scope': 'email',
+        'prompt': 'select_account'
+    },
+    request_token_url=None,
+    access_token_method='POST')
 
-MICROSOFT = {
-    # TODO: add the stuff from Authy.py that is hacked in and remove from Auth.py.
-}
+ms_access_token_url = 'https://login.microsoftonline.com/{Tenant}/oauth2/token'.format(Tenant=os.environ.get('MICROSOFT_TENENT_ID'))
+ms_authorize__url = 'https://login.microsoftonline.com/{Tenant}/oauth2/authorize'.format(Tenant=os.environ.get('MICROSOFT_TENENT_ID'))
+
+MICROSOFT = dict(
+	consumer_key=os.getenv('MICROSOFT_APP_ID'),
+	consumer_secret=os.getenv('MICROSOFT_APP_SECRET'),
+	base_url='http://ignore',  # We won't need this
+	access_token_url=ms_access_token_url,
+	authorize_url=ms_authorize__url,
+	request_token_params={
+        'scope': 'email'
+    },
+	request_token_url=None,
+	access_token_method='POST'
+)
+
 
 SENDGRID_AUTH = {
     'user': os.environ.get("SENDGRID_USER"),
