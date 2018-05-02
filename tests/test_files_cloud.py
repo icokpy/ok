@@ -91,4 +91,11 @@ class GoogleCloudTestFile(CloudTestFile):
     container_env_name = "GCP_STORAGE_CONTAINER"
 
 
+class AzureBlobTestFile(CloudTestFile):
+    storage_provider = "AZURE_BLOBS"
+    key_env_name = "AZURE_STORAGE_KEY"
+    secret_env_name = "AZURE_STORAGE_SECRET"
+    container_env_name = "AZURE_STORAGE_CONTAINER"
+
+
 del CloudTestFile, TestFile
