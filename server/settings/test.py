@@ -26,6 +26,11 @@ if SQLALCHEMY_DATABASE_URI.startswith(sqlite_prefix):
     SQLALCHEMY_DATABASE_URI = (sqlite_prefix +
             os.path.abspath(SQLALCHEMY_DATABASE_URI[len(sqlite_prefix) + 1:]))
 
+sql_ca_cert = os.getenv('SQL_CA_CERT')
+azure_uri = "azure"
+if sql_ca_cert and azure_uri in SQLALCHEMY_DATABASE_URI:
+    SQLALCHEMY_ENGINE_OPTS = {'connect_args': {'ssl': {'ca': sql_ca_cert}}}
+
 WTF_CSRF_CHECK_DEFAULT = False
 WTF_CSRF_ENABLED = False
 
