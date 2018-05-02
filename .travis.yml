@@ -23,7 +23,7 @@ install:
 script:
 - if [ "$SETUP" = "docker" ]; then docker run -it cs61a/ok-server py.test tests/;
   fi
-- if [ "$SETUP" = "native" ]; then py.test --cov-report term-missing --cov=server
+- if [ "$SETUP" = "native" ]; then py.test -sv --cov-report term-missing --cov=server
   tests/  --ignore tests/test_web.py --timeout=30; fi
 after_success:
 - if [ "$SETUP" = "native" ]; then echo "eventually should run coveralls here"; fi
