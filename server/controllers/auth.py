@@ -3,9 +3,11 @@ There are two ways to authenticate a request:
 * Present the session cookie returned after logging in
 * Send a Google access token as the access_token query parameter
 """
-import os  # TODO: factor out
-from flask import (abort, Blueprint, current_app, flash, redirect,
+
+from flask import (abort, Blueprint, current_app, flash, Flask, redirect,
                    render_template, request, session, url_for, jsonify)
+
+from flask import app as myApp
 from flask_oauthlib.client import OAuth, OAuthException
 from flask_oauthlib.contrib.oauth2 import bind_sqlalchemy
 
@@ -33,38 +35,12 @@ def record_params(setup_state):
     app = setup_state.app
     oauth.init_app(app)
 
+
 oauth = OAuth()
-# TODO: need some conditional to either add 1 or at runtime choose 1.
-# TODO: both Google and Microsoft should be moved to ./settings to they are in app.config for flask app
-google_auth_old = oauth.remote_app(
-    'google',
-    app_key='GOOGLE',
-    request_token_params={
-        'scope': 'email',
-        'prompt': 'select_account'
-    },
-    base_url='https://www.googleapis.com/oauth2/v3/',
-    request_token_url=None,
-    access_token_method='POST',
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-)
- 
-# TODO: rename as microsoft_auth
-google_auth = oauth.remote_app(
-	'microsoft',
-    app_key='MICROSOFT',
-	consumer_key=os.getenv('OAUTH_ID'), # TODO: could be env MICROSOFT_ID
-	consumer_secret=os.getenv('OAUTH_SECRET'), # TODO: could be env MICROSOFT_SECRET
-	request_token_params={
-        'scope': 'email'
-    },
-	base_url='http://ignore',  # We won't need this
-	request_token_url=None,
-	access_token_method='POST',
-	access_token_url='https://login.microsoftonline.com/ab1fb3c5-c204-46a9-90c1-eee1acccd5ba/oauth2/token',
-	authorize_url='https://login.microsoftonline.com/ab1fb3c5-c204-46a9-90c1-eee1acccd5ba/oauth2/authorize'
-)
+# the_auth_provider = current_app.config.get('OAUTH_PROVIDER')
+google_auth = oauth.remote_app('google', app_key = 'GOOGLE')
+
+# microsoft_auth_nn = oauth.remote_app( app_key='microsoft', current_app.config['MICROSOFT'])
 
 # TODO: what to do about functions named google_ etc.  like in Passport they are a "strategy" to deserial;ize, workl with,etc.
 @google_auth.tokengetter
