@@ -55,3 +55,4 @@ _cache/
 # local development
 database.db
 *.db
+secrets.env
