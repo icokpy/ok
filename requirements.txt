@@ -78,6 +78,9 @@ bleach==2.0.0
 # Logging
 gcloud==0.18.3
 
+# Azure Storage
+azure-storage-blob==1.1.0
+
 # Development
 Flask-DebugToolbar==0.10.1
 Flask-Script==2.0.5
