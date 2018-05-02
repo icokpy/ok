@@ -3,7 +3,7 @@
    Jenkins instance at: http://ok-jenkins.uksouth.cloudapp.azure.com/ 
 */
 
-String dockerTag = "${env.BUILD_TAG}".toLowerCase()
+String dockerTag = "${env.BUILD_TAG}".toLowerCase().replaceAll("[^\\p{IsAlphabetic}^\\p{IsDigit}]", "-")
 
 // Run in declarative pipeline
 pipeline {
