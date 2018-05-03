@@ -3,30 +3,27 @@ dist: trusty
 language: python
 cache: pip
 services:
-- docker
-- redis
+  - docker
+  - redis
 python:
-- '3.5'
+  - '3.5'
 env:
   global:
-  - OK_ENV=test
+    - OK_ENV=test
   matrix:
-  - SETUP=docker
-  - SETUP=native
-  - SETUP=native
-    DB_ROW_FORMAT=default
-    secure: "bjs53iofYDA2towR7zexfWvPxNkwI1n1IFWrjQPrdm8QIfuc2d/VMI9uw4wZw4i4O5XV5rBR1EB/9rTzvTDWQVRI+g5gG38skbSqbfuikWMFzbU/cL6DSuBT/5budhEen5im+0cE4WIxERC1awYbjsZ5GdEFW7huFQ9iMYxZ69Xia4R1VI8D74kLGUb5N9k8dnSQqF9bj8Rh9fi/Hb4oSm0A418TKLOQM0Ne2WZ4rjdf37XAjL0AlZ6w7BW997/j7vvqNWFbi6/7XgdwjphoMjacHopwljory+iNDF59pfs3XVDRxxEsCPqxzIiDlMWQ/KVh0sW9/VQ/nj9D2LKbT//IZ1a2yr8CZVkc9zGBG00DNKp7UOCiGmaFO1EqQobFSSUPJ5ynxaXDW02Ms4zjReHrq7uTHCQ6t7PHjIlhJSECRRxVrv5ML6Vr/hHhHuR11pwmZLexuoVNambdNvXUWzP6UD8Gbt8NvnTXHl0cj4pEKN51lJOfTMgoZSpfHDMXT+dmumeSxNQHL83xppKY2mGOd/kZM2HFXcitcO0W7BGnrvfwFcbuicojZ1V1szkfDM8R8Om+t9PxWqqPr+entQViEt7UMIfo+6PrxmPwpkZvprrjkiIxURC9us4kQedEuShBZ7xJzpX/j5HAOV3V76bsAlWVZj9f5kO6Vy5uDXU="
+    - SETUP=docker
+    - SETUP=native
+    - SETUP=native
+      DB_ROW_FORMAT=default
 install:
-- if [ "$SETUP" = "docker" ]; then make docker-build; fi
-- if [ "$SETUP" = "native" ]; then pip install -r requirements.txt; fi
-- if [ "$SETUP" = "native" ]; then pip install pytest-timeout python-coveralls; fi
+  - if [ "$SETUP" = "docker" ]; then make docker-build; fi
+  - if [ "$SETUP" = "native" ]; then pip install -r requirements.txt; fi
+  - if [ "$SETUP" = "native" ]; then pip install pytest-timeout python-coveralls; fi
 script:
-- if [ "$SETUP" = "docker" ]; then docker run -it cs61a/ok-server py.test tests/;
-  fi
-- if [ "$SETUP" = "native" ]; then py.test -sv --cov-report term-missing --cov=server
-  tests/  --ignore tests/test_web.py --timeout=30; fi
+  - if [ "$SETUP" = "docker" ]; then docker run -it cs61a/ok-server py.test tests/; fi
+  - if [ "$SETUP" = "native" ]; then py.test -sv --cov-report term-missing --cov=server tests/  --ignore tests/test_web.py --timeout=30; fi
 after_success:
-- if [ "$SETUP" = "native" ]; then echo "eventually should run coveralls here"; fi
+  - if [ "$SETUP" = "native" ]; then echo "eventually should run coveralls here"; fi
 notifications:
   email: false
   slack:
