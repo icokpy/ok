@@ -127,13 +127,13 @@ class Storage:
         if container_name is None:
             container_name = self.container_name
         driver_name = self.driver.name.lower()
-        expiry_datetime = (dt.datetime.now() + dt.timedelta(seconds=timeout))
+        expiry_timestamp = (dt.datetime.now() + dt.timedelta(seconds=timeout)).timestamp()
 
         if 's3' in driver_name or 'google' in driver_name:
             keyIdName = "AWSAccessKeyId" if "s3" in driver_name else "GoogleAccessId"
-            return self._generate_google_aws_signed_url(keyIdName, obj_name, expiry_datetime)
+            return self._generate_google_aws_signed_url(keyIdName, obj_name, expiry_timestamp)
         elif 'azure' in driver_name:
-            return self._generate_azure_signed_url(obj_name, expiry_datetime)
+            return self._generate_azure_signed_url(obj_name, expiry_timestamp)
         else:
             raise Exception('{0} does not support signed urls'.format(driver_name))
 
@@ -142,11 +142,11 @@ class Storage:
         """
         return self.driver.download_object_as_stream(object)
 
-    def _generate_google_aws_signed_url(self, keyIdName, obj_name, expiry_datetime):
-        """ 
+    def _generate_google_aws_signed_url(self, keyIdName, obj_name, expiry_timestamp):
+        """
         Generates a signed URL compatible with Google Cloud and AWS S3
         """
-        expires = int(expiry_datetime.timestamp())
+        expires = int(expiry_timestamp)
         obj_path = "{0}/{1}".format(self.container.name, obj_name)
         s2s = ("GET\n\n\n{expires}\n/{object_name}"
                .format(expires=expires, object_name=obj_path).encode('utf-8'))
@@ -161,16 +161,16 @@ class Storage:
         secure_url = self.get_url(obj_path)
         return "{0}?{1}".format(secure_url, url_kv)
 
-    def _generate_azure_signed_url(self, obj_name, expiry_datetime):
-        """ 
+    def _generate_azure_signed_url(self, obj_name, expiry_timestamp):
+        """
         Generates a signed URL compatible with Azure
         Blob Storage
         """
         # libcloud encodes the access key, so it needs decoding
         secret_as_string = base64.b64encode(self.driver.secret).decode()
 
-        # azure expiry times need to be ISO8601 (no milliseconds, and with the timezone character)
-        expires = expiry_datetime.replace(microsecond=0).isoformat() + 'Z'
+        # azure expiry times are UTC dates, ISO8601 format, no milliseconds, with the timezone character suffix
+        expires = dt.datetime.utcfromtimestamp(expiry_timestamp).replace(microsecond=0).isoformat() + 'Z'
 
         blob_service = BlockBlobService(self.driver.key, secret_as_string)
 
