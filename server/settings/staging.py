@@ -63,9 +63,9 @@ if STORAGE_PROVIDER == 'LOCAL' and not os.path.exists(STORAGE_CONTAINER):
 
 # TODO: NEW OAUTH SETTINGS
 
-if "GOOGLE_ID" not in os.environ or "GOOGLE_SECRET" not in os.environ:
+if "GOOGLE_ID" in os.environ or "GOOGLE_SECRET" in os.environ:
     OAUTH_PROVIDER='GOOGLE'
-elif "MICROSOFT_APP_ID" not in os.environ or "MICROSOFT_APP_SECRET" not in os.environ:
+elif "MICROSOFT_APP_ID" in os.environ or "MICROSOFT_APP_SECRET" in os.environ:
     OAUTH_PROVIDER='MICROSOFT'
 else:
     print("Please set the Google or Microsoft OAuth ID and Secret variables.")
