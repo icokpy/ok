@@ -125,9 +125,16 @@ def microsoft_user_data(token):
 
     try:
         decoded_token = jwt.decode(token, verify=False)
-        return {'email': decoded_token['preferred_username']}
-    except requests.exceptions.Timeout as e:
-        logger.error("Unable to decode token from Microsoft")
+        if 'unique_name' in decoded_token: # Azure V1 endpoints
+            return {'email': decoded_token['unique_name']} 
+        if 'preferred_username' in decoded_token:  # Azure V2 endpoints
+            return {'email': decoded_token['preferred_username']}
+
+        logger.error("Unable to retreive unique_name from token - which is email")
+        return None
+    except jwt.DecodeError as e:
+        logger.error("jwt Decode error from token")
+        logger.error('Decode error was %s', e)
         return None
 
 def user_from_provider_token(token):
