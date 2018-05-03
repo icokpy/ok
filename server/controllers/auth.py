@@ -27,29 +27,15 @@ logger = logging.getLogger(__name__)
 auth = Blueprint('auth', __name__)
 auth.config = {}
 
-app = None
-provider_auth = None
-provider_name = None
-
 oauth = OAuth()
 
 @auth.record
 def record_params(setup_state):
     """ Load used app configs into local config on registration from
     server/__init__.py """
-    global app
-    global provider_name
-    global provider_auth
     app = setup_state.app
-    provider_name = app.config.get('OAUTH_PROVIDER')
-    provider_auth = oauth.remote_app(
-        provider_name, 
-        app_key=provider_name # TODO: None fail check.
-    )
+    set_provider_auth()
     oauth.init_app(app)
-    #instead of decorator set the fn pointer to the func here
-    provider_auth._tokengetter = provider_token
-
 
 def provider_token(token=None):
     return session.get('provider_token')
@@ -57,6 +43,27 @@ def provider_token(token=None):
 ###########
 # Helpers #
 ###########
+
+def safe_cast(val, to_type, default=None):
+    try:
+        return to_type(val)
+    except (ValueError, TypeError):
+        return default
+
+def get_provider_name():
+    return current_app.config.get('OAUTH_PROVIDER')
+
+def set_provider_auth():
+    provider_auth = oauth.remote_app(
+        get_provider_name(), 
+        app_key=get_provider_name() # TODO: None fail check.
+    )
+    #instead of decorator set the fn pointer to the func here
+    provider_auth._tokengetter = provider_token
+    current_app.config.set('REMOTE_APP_PROVIDER', provider_auth)
+
+def get_provider_auth():
+    return current_app.config.get('REMOTE_APP_PROVIDER')
 
 def check_oauth_token(scopes=None):
     """ Check the request for OAuth creds.
@@ -91,7 +98,7 @@ def google_user_data(token, timeout=5):
         logger.info("Google Token is None")
         return None
 
-    google_plus_endpoint = app.config.get(provider_name)['profile_url']
+    google_plus_endpoint = current_app.config.get(get_provider_name())['profile_url']
 
     try:
         r = requests.get(google_plus_endpoint.format(token), timeout=timeout)
@@ -104,7 +111,7 @@ def google_user_data(token, timeout=5):
         return None
 
     # If Google+ didn't work - fall back to OAuth2
-    oauth2_endpoint = app.config.get(provider_name)['userinfo_url'] 
+    oauth2_endpoint = current_app.config.get(get_provider_name())['userinfo_url'] 
 
     try:
         r = requests.get(oauth2_endpoint.format(token), timeout=timeout)
@@ -142,9 +149,9 @@ def user_from_provider_token(token):
         return user_from_email("okstaff@okpy.org")
 
     # TODO: externalize these strings and genericize
-    if provider_name == 'GOOGLE':
+    if get_provider_name() == 'GOOGLE':
         user_data = google_user_data(token)
-    elif provider_name == 'MICROSOFT':
+    elif get_provider_name() == 'MICROSOFT':
         user_data = microsoft_user_data(token)
 
     # TODO: fixup
@@ -220,13 +227,13 @@ def login():
     """
     if use_testing_login():
         return redirect(url_for('.testing_login'))
-    return provider_auth.authorize(
+    return get_provider_auth().authorize(
         callback=url_for('.authorized', _external=True),
         login_hint=request.args.get('login_hint'))
 
 @auth.route('/login/authorized/')
 def authorized():
-    resp = provider_auth.authorized_response()
+    resp = get_provider_auth().authorized_response()
     if resp is None:
         error = "Access denied: reason={0} error={1}".format(
             request.args['error_reason'],
@@ -254,13 +261,6 @@ def authorized():
     session['token_expiry'] = dt.datetime.now() + dt.timedelta(seconds=expires_in)
     session['provider_token'] = (access_token, '')  # (access_token, secret)
     return authorize_user(user)
-
-
-def safe_cast(val, to_type, default=None):
-    try:
-        return to_type(val)
-    except (ValueError, TypeError):
-        return default
 
 ################
 # Other Routes #
