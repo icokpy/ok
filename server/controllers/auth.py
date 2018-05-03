@@ -27,7 +27,6 @@ logger = logging.getLogger(__name__)
 auth = Blueprint('auth', __name__)
 auth.config = {}
 
-app = None
 provider_auth = None
 provider_name = None
 
@@ -37,7 +36,6 @@ oauth = OAuth()
 def record_params(setup_state):
     """ Load used app configs into local config on registration from
     server/__init__.py """
-    global app
     global provider_name
     global provider_auth
     app = setup_state.app
@@ -91,7 +89,7 @@ def google_user_data(token, timeout=5):
         logger.info("Google Token is None")
         return None
 
-    google_plus_endpoint = app.config.get(provider_name)['profile_url']
+    google_plus_endpoint = current_app.config.get(provider_name)['profile_url']
 
     try:
         r = requests.get(google_plus_endpoint.format(token), timeout=timeout)
@@ -104,7 +102,7 @@ def google_user_data(token, timeout=5):
         return None
 
     # If Google+ didn't work - fall back to OAuth2
-    oauth2_endpoint = app.config.get(provider_name)['userinfo_url'] 
+    oauth2_endpoint = current_app.config.get(provider_name)['userinfo_url'] 
 
     try:
         r = requests.get(oauth2_endpoint.format(token), timeout=timeout)
