@@ -20,6 +20,7 @@ from server.controllers.files import files
 from server.constants import API_PREFIX
 
 from server.extensions import (
+    appinsights,
     assets_env,
     cache,
     csrf,
@@ -60,6 +61,9 @@ def create_app(default_config_path=None):
                 event_id=g.sentry_event_id,
                 public_dsn=sentry.client.get_public_dsn('https')
             ), 500
+
+    # Azure Application Insights request and error tracking
+    appinsights.init_app(app)
 
     @app.errorhandler(404)
     def not_found_error(error):
