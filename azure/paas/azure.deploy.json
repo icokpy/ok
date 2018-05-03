@@ -44,7 +44,11 @@
         "defaultValue":"",
               "type": "string"
       },
-      
+      "azureAdTenantID":{
+
+        "defaultValue":"",
+        "type": "string"
+      },
       "mySqlUsername": {
         "type": "string",
         "minLength": 1,
@@ -396,11 +400,6 @@
             
                 
             },
-            "sendgridSmtpServer": {
-              
-              "value": "[reference('SendGrid').outputs.SendGrid.value.smtpServer]"
-            },
-
             "sendgridAccountName": {
               
               "value":  "[reference('SendGrid').outputs.SendGrid.value.username]"
@@ -421,6 +420,10 @@
             },
             "azureAdAppSecret":{
               "value":"[parameters('azureAdAppSecret')]"
+                  
+            },
+            "azureAdTenantID":{
+              "value":"[parameters('azureAdTenantID')]"
                   
             },
             "SecretKey":{
@@ -512,12 +515,7 @@
             
                 
             },
-            "sendgridSmtpServer": {
-              
-              "value": "[reference('SendGrid').outputs.SendGrid.value.smtpServer]"
-            },
-
-            "sendgridAccountName": {
+                       "sendgridAccountName": {
               
               "value":  "[reference('SendGrid').outputs.SendGrid.value.username]"
             },
