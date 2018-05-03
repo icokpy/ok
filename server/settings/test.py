@@ -1,5 +1,7 @@
 import os
 
+from server.settings import GOOGLE, MICROSOFT
+
 ENV = 'test'
 SECRET_KEY = os.getenv('OK_SESSION_KEY', 'testkey')
 

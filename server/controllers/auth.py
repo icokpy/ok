@@ -30,7 +30,7 @@ auth.config = {}
 provider_auth = None
 provider_name = None
 
-oauth = OAuth()
+oauth = None
 
 @auth.record
 def record_params(setup_state):
@@ -38,20 +38,18 @@ def record_params(setup_state):
     server/__init__.py """
     global provider_name
     global provider_auth
+    global oauth
+    oauth = OAuth()
     app = setup_state.app
     provider_name = app.config.get('OAUTH_PROVIDER', 'GOOGLE')
-    if provider_name is not None:
-        provider_auth = oauth.remote_app(
-            provider_name, 
-            app_key=provider_name # TODO: None fail check.
-        )
-        provider_auth._tokengetter = provider_token
-
+    provider_auth = oauth.remote_app(
+        provider_name, 
+        app_key=provider_name # TODO: None fail check.
+    )
+    provider_auth._tokengetter = provider_token
     oauth.init_app(app)
     #instead of decorator set the fn pointer to the func here
    
-
-
 def provider_token(token=None):
     return session.get('provider_token')
 

@@ -1,5 +1,7 @@
 import os
 
+from server.settings import GOOGLE, MICROSOFT
+
 ENV = 'dev'
 SECRET_KEY = os.getenv('OK_SESSION_KEY', 'changeinproductionkey')
 CACHE_TYPE = 'simple'
