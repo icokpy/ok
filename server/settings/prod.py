@@ -5,6 +5,7 @@ import os
 import sys
 
 from server.settings import RAVEN_IGNORE_EXCEPTIONS
+from server.settings import GOOGLE, MICROSOFT
 
 ENV = 'prod'
 PREFERRED_URL_SCHEME = 'https'
@@ -66,19 +67,17 @@ STORAGE_CONTAINER = os.environ.get('STORAGE_CONTAINER',  'ok-v3-user-files')
 STORAGE_KEY = os.environ.get('STORAGE_KEY', '')
 STORAGE_SECRET = os.environ.get('STORAGE_SECRET', '').replace('\\n', '\n')
 
-try:
-    os.environ["GOOGLE_ID"]
-    os.environ["GOOGLE_SECRET"]
-except KeyError:
-    print("Please set the google login variables.")
+# TODO: NEW OAUTH SETTINGS
+
+if "GOOGLE_ID" in os.environ or "GOOGLE_SECRET" in os.environ:
+    OAUTH_PROVIDER='GOOGLE'
+elif "MICROSOFT_APP_ID" in os.environ or "MICROSOFT_APP_SECRET" in os.environ:
+    OAUTH_PROVIDER='MICROSOFT'
+else:
+    print("Please set the Google or Microsoft OAuth ID and Secret variables.")
     sys.exit(1)
-
-# Service Keys
-
-GOOGLE = {
-    'consumer_key': os.environ.get('GOOGLE_ID'),
-    'consumer_secret':  os.environ.get('GOOGLE_SECRET')
-}
+        
+########
 
 SENDGRID_AUTH = {
     'user': os.environ.get("SENDGRID_USER"),
