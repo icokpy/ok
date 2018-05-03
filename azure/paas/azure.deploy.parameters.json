@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "appName": {
+        "value":"mrokpy"
+      }, 
+      "mySqlUsername": {
+           "value":"adminmarcus"
+        },
+          "mySqlAdminPassword": {
+            "value":"Password1234"
+          },
+                "sendgridAccountName": {
+            "value":"mrsendgrid"
+          },
+          "sendgridPassword": {
+            "value":"Password1234"
+          },
+          "templateBaseURL": {
+            "value":"https://raw.githubusercontent.com/icokpy/ok/enhancement/icokpy/azure-deploy/azure/paas/"
+          },
+          "dockerRegistryUsername":{
+
+            "value":"icokpy"
+          },
+          "dockerRegistryPassword":{
+
+            "value":""
+          },
+          "dockerRegistryUrl":{
+
+            "value":"icokpy.azurecr.io"
+          },
+          "dockerImageName":{
+
+            "value":""
+          }
+    }
+  }
+
+
+ 
