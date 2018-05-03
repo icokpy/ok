@@ -1,3 +1,4 @@
+from applicationinsights.flask.ext import AppInsights
 from flask_caching import Cache
 from flask_wtf.csrf import CSRFProtect
 from flask_debugtoolbar import DebugToolbarExtension
