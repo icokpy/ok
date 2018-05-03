@@ -22,7 +22,7 @@ pipeline {
                               script {
 
                                    // generate version, it's important to remove the trailing new line in git describe output
-                                   def version = sh script: 'git describe | tr -d "\n"', returnStdout: true
+                                   def version = sh script: 'git rev-parse --short HEAD | tr -d "\n"', returnStdout: true
                                    def imageName = "icokpy"
                                    def acrUrl = 'https://icokpy.azurecr.io'
                                    def webAppResourceGroup = 'icokpy-deployment'
