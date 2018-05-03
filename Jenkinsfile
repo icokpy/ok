@@ -28,7 +28,7 @@ pipeline {
                                    def webAppResourceGroup = 'icokpy-deployment'
                                    def webAppName = 'icokpy'
 
-                                   def okImage = docker.build("${imageName}:${version}")
+                                   def okImage = docker.build("${imageName}:${env.BUILD_NUMBER}_${version}")
 
                                    okImage.inside() {
                                         sh 'py.test tests/ --ignore=tests/test_job.py'
@@ -56,14 +56,14 @@ pipeline {
                                              withCredentials([usernamePassword(credentialsId: 'icokpy-mysql-credentials', usernameVariable: 'mysqlUser', passwordVariable: 'mysqlPass')]) {
                                                withCredentials([usernamePassword(credentialsId: 'icokpy-sendgrid', usernameVariable: 'sendgridUser', passwordVariable: 'sendgridPass')]) {
                                                  withCredentials([usernamePassword(credentialsId: 'icokpy-registry-credentials', usernameVariable: 'acrUser', passwordVariable: 'acrPass')]) {
-                                                   sh '''
-                                                     az group deployment create --resource-group $webAppResourceGroup --template-file azure/paas/azure.deploy.json \
+                                                   sh """
+                                                     az group deployment create --resource-group ${webAppResourceGroup} --template-file azure/paas/azure.deploy.json \
                                                        --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName}:${version} \
                                                        --parameters mySqlUsername=${mysqlUser} --parameters mySqlAdminPassword=${mysqlPass} \
                                                        --parameters sendgridAccountName=${sendgridUser} --parameters sendgridPassword=${sendgridPass} \
                                                        --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
-                                                       --parameters dockerRegistryUrl=$acrUrl --parameter appName=${webAppName}
-                                                     '''
+                                                       --parameters dockerRegistryUrl=$acrUrl --parameter appName='icokpy-dev'
+                                                   """
                                                  }
                                                }
                                              }
