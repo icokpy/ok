@@ -10,6 +10,11 @@ To run tests for Google Cloud Platform, set the following environment variables:
 - GCP_STORAGE_SECRET
 - GCP_STORAGE_CONTAINER
 
+To run tests for Azure, set the following environment variables:
+- AZURE_STORAGE_KEY
+- AZURE_STORAGE_SECRET
+- AZURE_STORAGE_CONTAINER
+
 """
 # TODO(@colinschoen) Configure CI to run the full integration test suite only on protected branches like master.
 
@@ -89,6 +94,25 @@ class GoogleCloudTestFile(CloudTestFile):
     key_env_name = "GCP_STORAGE_KEY"
     secret_env_name = "GCP_STORAGE_SECRET"
     container_env_name = "GCP_STORAGE_CONTAINER"
+
+
+class AzureBlobTestFile(CloudTestFile):
+    storage_provider = "AZURE_BLOBS"
+
+    # this is the storage account name in the Azure Portal
+    key_env_name = "AZURE_STORAGE_KEY"
+    # this is the storage account key in the Azure Portal
+    secret_env_name = "AZURE_STORAGE_SECRET"
+
+    container_env_name = "AZURE_STORAGE_CONTAINER"
+
+    def test_simple(self):
+        reason = """
+        An issue in libcloud causes this to fail for Azure storage, 
+        but the code being tested is not used for *any* cloud storage,
+        so it's safe to skip this test
+        """
+        raise unittest.SkipTest(reason) 
 
 
 del CloudTestFile, TestFile

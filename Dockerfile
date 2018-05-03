@@ -1,6 +1,6 @@
 FROM python:3.5-alpine
 
-RUN apk add --update patch ca-certificates nginx perl;
+RUN apk add --update patch ca-certificates nginx perl musl-dev openssl-dev libffi-dev python-dev gcc;
 
 RUN mkdir /code/
 WORKDIR /code/
@@ -14,6 +14,8 @@ RUN mv docker/nginx/nginx.conf /etc/nginx/nginx.conf
 RUN mv docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 
 RUN ./manage.py assets build
+
+ENV SQL_CA_CERT=/code/BaltimoreCyberTrustRoot.crt.pem
 
 CMD nginx && \
     env PYTHONPATH=$PYTHONPATH:$PWD gunicorn \
