@@ -84,3 +84,5 @@ SENDGRID_AUTH = {
     'user': os.environ.get("SENDGRID_USER"),
     'key': os.environ.get("SENDGRID_KEY")
 }
+
+APPLICATION_INSIGHTS_KEY = os.getenv('APPLICATION_INSIGHTS_KEY')
