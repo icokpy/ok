@@ -18,7 +18,7 @@
             "value":"Password1234"
           },
           "templateBaseURL": {
-            "value":"https://raw.githubusercontent.com/icokpy/ok/enhancement/icokpy/azure-deploy/azure/paas/"
+            "value":"https://raw.githubusercontent.com/icokpy/ok/enhancement/icokpy/azure-tempaltes/azure/paas/"
           },
           "dockerRegistryUsername":{
 
@@ -26,7 +26,7 @@
           },
           "dockerRegistryPassword":{
 
-            "value":""
+            "value":"kHPhPUpIOqjVO4ZAOD2qK2ORNAOr=7S3"
           },
           "dockerRegistryUrl":{
 
@@ -34,7 +34,7 @@
           },
           "dockerImageName":{
 
-            "value":""
+            "value":"icokpy-9"
           }
     }
   }

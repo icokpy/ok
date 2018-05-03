@@ -397,7 +397,7 @@
             },
             "applicationInsightsKey":{
 
-              "value":  "[reference('AppInsights').outputs.AppInsights.value.key]"
+              "value":  "[reference('AppInsights').outputs.AppInsights.value.InstrumentationKey]"
                 
               
             }
@@ -500,7 +500,7 @@
             },
             "applicationInsightsKey":{
 
-              "value":  "[reference('AppInsights').outputs.AppInsights.value.key]"
+              "value":  "[reference('AppInsights').outputs.AppInsights.value.InstrumentationKey]"
                 
               
             }
