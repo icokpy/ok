@@ -5,6 +5,9 @@
       "appName": {
         "value":"mrokpy"
       }, 
+      "ok_env": {
+        "value": "simple"
+      },      
       "mySqlUsername": {
            "value":"adminmarcus"
         },
@@ -26,7 +29,7 @@
           },
           "dockerRegistryPassword":{
 
-            "value":"kHPhPUpIOqjVO4ZAOD2qK2ORNAOr=7S3"
+            "value":""
           },
           "dockerRegistryUrl":{
 
@@ -34,8 +37,24 @@
           },
           "dockerImageName":{
 
-            "value":"icokpy-9"
-          }
+            "value":""
+          },
+          "dockerImageTag":{
+
+            "value":"oauth"
+          },
+          "azureAdAppID":{
+            "value": ""
+          },
+          "azureAdAppSecret":{
+
+            "value": ""
+          },
+            "SecretKey":{
+              "value":""
+                  
+            }
+         
     }
   }
 
