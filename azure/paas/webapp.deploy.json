@@ -57,11 +57,11 @@
       "type": "string"
      },
      "azureAdAppID":{
-      "value":"[parameters('azureAdAppId')]"
+      "type": "string"
   
     },
     "azureAdAppSecret":{
-      "value":"[parameters('azureAdAppSecret')]"
+      "type": "string"
           
     },
       "mysqlUsername": {
