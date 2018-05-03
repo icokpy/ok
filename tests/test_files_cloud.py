@@ -10,6 +10,11 @@ To run tests for Google Cloud Platform, set the following environment variables:
 - GCP_STORAGE_SECRET
 - GCP_STORAGE_CONTAINER
 
+To run tests for Azure, set the following environment variables:
+- AZURE_STORAGE_KEY
+- AZURE_STORAGE_SECRET
+- AZURE_STORAGE_CONTAINER
+
 """
 # TODO(@colinschoen) Configure CI to run the full integration test suite only on protected branches like master.
 
