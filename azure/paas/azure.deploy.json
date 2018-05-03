@@ -36,7 +36,15 @@
         "defaultValue": "latest",
         "type": "string"
       },
-     
+      "azureAdAppID":{
+        "defaultValue":"",
+        "type": "string"
+      },
+      "azureAdAppSecret":{
+        "defaultValue":"",
+              "type": "string"
+      },
+      
       "mySqlUsername": {
         "type": "string",
         "minLength": 1,
@@ -400,7 +408,16 @@
               "value":  "[reference('AppInsights').outputs.AppInsights.value.InstrumentationKey]"
                 
               
+            },
+            "azureAdAppID":{
+              "value":"[parameters('azureAdAppId')]"
+          
+            },
+            "azureAdAppSecret":{
+              "value":"[parameters('azureAdAppSecret')]"
+                  
             }
+       
           }
         }
       },

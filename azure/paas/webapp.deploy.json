@@ -56,6 +56,14 @@
      {
       "type": "string"
      },
+     "azureAdAppID":{
+      "value":"[parameters('azureAdAppId')]"
+  
+    },
+    "azureAdAppSecret":{
+      "value":"[parameters('azureAdAppSecret')]"
+          
+    },
       "mysqlUsername": {
         "type": "string",
         "minLength": 1,
@@ -190,7 +198,9 @@
                                "sendgridUsername": "[parameters('sendgridAccountName')]",
                                "sendgridPassword": "[parameters('sendgridPassword')]",
                                "WEBSITE_HTTPLOGGING_RETENTION_DAYS": "7",
-                               "APPLICATION_INSIGHTS_KEY":"[parameters('applicationInsightsKey')]"
+                               "APPLICATION_INSIGHTS_KEY":"[parameters('applicationInsightsKey')]",
+                               "MICROSOFT_APP_SECRET":"[parameters('azureAdAppSecret')]",
+                               "MICROSOFT_APP_ID":"[parameters('azureAdAppId')]"
                             }
                         },
                         {
