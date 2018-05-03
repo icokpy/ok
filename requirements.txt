@@ -79,7 +79,6 @@ bleach==2.0.0
 
 # Google logging
 gcloud==0.18.3
-applicationinsights==0.11.2
 
 # Azure logging
 # until https://github.com/Microsoft/ApplicationInsights-Python/pull/79 is merged and released
