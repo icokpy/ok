@@ -85,7 +85,6 @@ pipeline {
                               sh 'curl https://bootstrap.pypa.io/get-pip.py | sudo python3'
                               sh 'sudo pip install -r requirements.txt'
                               sh 'sudo pip install pytest-timeout python-coveralls'
-                              sh 'py.test tests/ --ignore=tests/test_job.py'
                               sh 'py.test --cov-report term-missing --cov=server tests/  --ignore tests/test_web.py --timeout=30'
                          }
                     }
