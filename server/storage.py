@@ -109,12 +109,12 @@ class Storage:
         """
         driver_name = self.driver.name.lower()
         if 's3' in driver_name:
-            base_url = 'https://%s' % (self.driver.connection.host)
+            base_url = 'https://{}'.format(self.driver.connection.host)
             url = urljoin(base_url, object_path)
         elif 'google' in driver_name:
             url = urljoin('https://storage.googleapis.com', object_path)
         elif 'azure' in driver_name:
-            base_url = 'https://%s.blob.core.windows.net' % (self.driver.key)
+            base_url = 'https://{}.blob.core.windows.net'.format(self.driver.key)
             url = urljoin(base_url, object_path)
         else:
             raise Exception('Unsupported Storage Driver for URL')
@@ -127,16 +127,15 @@ class Storage:
         if container_name is None:
             container_name = self.container_name
         driver_name = self.driver.name.lower()
-        expiry_datetime = (dt.datetime.now() + dt.timedelta(seconds=timeout))        
+        expiry_datetime = (dt.datetime.now() + dt.timedelta(seconds=timeout))
 
         if 's3' in driver_name or 'google' in driver_name:
             keyIdName = "AWSAccessKeyId" if "s3" in driver_name else "GoogleAccessId"
             return self._generate_google_aws_signed_url(keyIdName, obj_name, expiry_datetime)
         elif 'azure' in driver_name:
-            return self._generate_azure_signed_url(obj_name, expiry_datetime)            
+            return self._generate_azure_signed_url(obj_name, expiry_datetime)
         else:
-            raise Exception('{0} does not support signed urls'.format(driver_name)) 
-       
+            raise Exception('{0} does not support signed urls'.format(driver_name))
 
     def get_object_stream(self, object):
         """ Data stream of the libcloud object.
@@ -145,7 +144,7 @@ class Storage:
 
     def _generate_google_aws_signed_url(self, keyIdName, obj_name, expiry_datetime):
         """ 
-        Generates a signed URL compatible with Google Cloud
+        Generates a signed URL compatible with Google Cloud and AWS S3
         """
         expires = int(expiry_datetime.timestamp())
         obj_path = "{0}/{1}".format(self.container.name, obj_name)
@@ -171,10 +170,17 @@ class Storage:
         secret_as_string = base64.b64encode(self.driver.secret).decode()
 
         # azure expiry times need to be ISO8601 (no milliseconds, and with the timezone character)
-        expiry_datetime = expiry_datetime.replace(microsecond=0).isoformat() + 'Z'
+        expires = expiry_datetime.replace(microsecond=0).isoformat() + 'Z'
 
         blob_service = BlockBlobService(self.driver.key, secret_as_string)
-        sas_token = blob_service.generate_blob_shared_access_signature(self.container.name, obj_name, permission=BlobPermissions(read=True), expiry=expiry_datetime)
-        signed_url = blob_service.make_blob_url(self.container.name, obj_name, sas_token=sas_token)
+
+        signed_url = blob_service.make_blob_url(
+            self.container.name,
+            obj_name,
+            sas_token=blob_service.generate_blob_shared_access_signature(
+                self.container.name,
+                obj_name,
+                permission=BlobPermissions(read=True),
+                expiry=expires))
 
         return signed_url
