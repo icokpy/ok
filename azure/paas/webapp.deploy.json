@@ -1,0 +1,242 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "appName": {
+        "type": "string",
+        "minLength": 1,
+        "metadata": {
+          "description": "Unique name for site"
+        }
+      },
+      "ok_env": {
+        "type": "string",
+        "defaultValue": "dev",
+        "allowedValues": [
+          "dev",
+          "simple",
+           "test",
+            "staging",
+          "prod"        
+        ],
+        "metadata": {
+          "description": "Unique name for site"
+        }
+      },
+      "dockerRegistryUrl":{
+
+        "type": "string"
+      },
+      "dockerRegistryUsername":{
+
+        "type": "string"
+      },
+      "dockerRegistryPassword":{
+
+        "type": "string"
+      },
+      "dockerImageName":{
+
+        "type": "string"
+      },
+      "dockerImageTag":{
+
+        "type": "string"
+      },
+      "dockerStartupCommand":{
+        "defaultValue": "",
+        "type": "string"
+
+      },
+     "storageAccountName":{
+      "type": "string"
+      },
+      
+     "storageAccountKey":
+     {
+      "type": "string"
+     },
+      "mysqlUsername": {
+        "type": "string",
+        "minLength": 1,
+        "metadata": {
+          "description": "MySQL Username"
+        }
+      },
+      "mysqlPassword": {
+        "type": "securestring",
+        "metadata": {
+          "description": "mysqlpassword"
+        }
+      },
+      "mySQLServerName": {
+        "type": "string",
+        "metadata": {
+          "description": "Unique SQL Server Name"
+        }
+      },
+      "redisFQDN": {
+        "type": "string",
+        "metadata": {
+          "description": "redis FQDN"
+        }
+    },
+    "redisPassword": {
+            "type": "securestring",
+            "metadata": {
+              "description": "redis  password"
+            }
+          
+      },
+      "sendgridSmtpServer": {
+              "type": "string",
+              "metadata": {
+                "description": "SendGrid Server"
+              }
+            
+        },
+          "sendgridAccountName": {
+                  "type": "string",
+                  "metadata": {
+                    "description": "SendGrid Account Name"
+                  }
+                
+            },
+            "sendgridPassword": {
+                    "type": "securestring",
+                    "metadata": {
+                      "description": "SendGrid  password"
+                    }
+                  
+              }
+    },
+  "variables": {
+
+  },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "sku": {
+                "name": "S1",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
+                "capacity": 1
+            },
+            "kind": "linux",
+            "name": "[concat(parameters('appName'),'_plan')]",
+            "apiVersion": "2016-09-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "workerSizeId": 0,
+                "reserved": true,
+                "hostingEnvironment": ""
+            },
+            "dependsOn": []
+        },
+          {
+             "type": "Microsoft.Web/sites",
+            "kind": "app,linux",
+            "name": "[parameters('appName')]",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', concat(parameters('appName'),'_plan'))]"
+            ],
+            "tags": {
+            },
+            "scale": null,
+            "properties": {
+                "name": "[parameters('appName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',concat(parameters('appName'),'_plan'))]",
+                "httpLoggingEnabled": true,
+                "logsDirectorySizeLimit": 35
+            },
+            "resources": [
+                        {
+                            "name": "appsettings",
+                            "type": "config",
+                            "apiVersion": "2016-08-01",
+                            "dependsOn": [
+                              "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
+                            ],
+                            "tags": {
+                              "displayName": "appSettings"
+                            },
+                            "properties": {
+                              "DOCKER_REGISTRY_SERVER_URL": "[parameters('dockerRegistryUrl')]",
+                              "DOCKER_REGISTRY_SERVER_USERNAME": "[parameters('dockerRegistryUsername')]", "DOCKER_REGISTRY_SERVER_PASSWORD": "[parameters('dockerRegistryPassword')]",
+                              "DOCKER_CUSTOM_IMAGE_NAME":"[concat(parameters('dockerRegistryUrl'),'/',parameters('dockerImageName'),':',parameters('dockerImageTag'))]",
+                              "DOCKER_CUSTOM_IMAGE_RUN_COMMAND":"",
+                              "WEBSITES_ENABLE_APP_SERVICE_STORAGE": "false",
+                              "DATABASE_URL":"[concat('mysql://',parameters('mySqlUsername'),'%40',parameters('mySQLServerName'),':',parameters('mysqlPassword'),'@',parameters('mySQLServerName'),'.mysql.database.azure.com:3306/ok?')]",
+                              "DB_ROW_FORMAT":"default",
+                               "REDIS_HOST":"[parameters('redisFQDN')]",
+                               "REDIS_PASSWORD":"[parameters('redisPassword')]",
+                               "STORAGE_PROVIDER":"AZURE_BLOBS",
+                               "STORAGE_KEY":"[parameters('storageAccountName')]",
+                               "STORAGE_SECRET":"[parameters('storageAccountKey')]",
+                               "STORAGE_CONTAINER":"okpyfiles",
+                               "OK_ENV":"[parameters('ok_env')]",
+                               "toAddress": "",
+                               "sendgridSmtpServer": "[parameters('sendgridSmtpServer')]",
+                               "sendgridUsername": "[parameters('sendgridAccountName')]",
+                               "sendgridPassword": "[parameters('sendgridPassword')]",
+                               "WEBSITE_HTTPLOGGING_RETENTION_DAYS": "7"
+                            }
+                        },
+                        {
+                  
+                          "name": "logs",
+                          "type": "config",
+                          "apiVersion": "2016-08-01",
+                          "tags": {},
+                          "dependsOn": [
+                            "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
+                          ],
+                          "properties": {
+                            "applicationLogs": {
+                              "fileSystem": {
+                                "level": "Off"
+                              },
+                              "azureTableStorage": {
+                                "level": "Off",
+                                "sasUrl": null
+                              },
+                              "azureBlobStorage": {
+                                "level": "Off",
+                                "sasUrl": null,
+                                "retentionInDays": null
+                              }
+                            },
+                            "httpLogs": {
+                              "fileSystem": {
+                                "retentionInMb": 35,
+                                "retentionInDays": 7,
+                                "enabled": true
+                              },
+                              "azureBlobStorage": {
+                                "sasUrl": null,
+                                "retentionInDays": 7,
+                                "enabled": false
+                              }
+                            },
+                            "failedRequestsTracing": {
+                              "enabled": false
+                            },
+                            "detailedErrorMessages": {
+                              "enabled": false
+                            }
+                          }
+                        }
+                        
+                        
+                       
+                    ]
+                }
+               ],
+      
+       "outputs": {
+        
+       }
+     }
