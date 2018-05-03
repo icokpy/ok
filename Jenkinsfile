@@ -42,7 +42,7 @@ pipeline {
                                         }
 
                                         // Install azure-cli tools on the build slave
-                                        sh 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ xenial main" | sudo tee /etc/apt/sources.list.d/azure-cli.listd'
+                                        sh 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ xenial main" | sudo tee /etc/apt/sources.list.d/azure-cli.list'
                                         sh 'sudo apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893'
                                         sh 'curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -'
                                         sh 'sudo apt-get -y install apt-transport-https'
