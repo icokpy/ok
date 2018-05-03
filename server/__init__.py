@@ -1,7 +1,5 @@
 import os
 
-from applicationinsights.logging import LoggingHandler
-from applicationinsights.requests import WSGIApplication
 from flask import Flask, render_template, g, request
 from flask_rq import RQ
 from webassets.loaders import PythonLoader as PythonAssetsLoader
@@ -22,6 +20,7 @@ from server.controllers.files import files
 from server.constants import API_PREFIX
 
 from server.extensions import (
+    appinsights,
     assets_env,
     cache,
     csrf,
@@ -39,11 +38,6 @@ def create_app(default_config_path=None):
     """
 
     app = Flask(__name__)
-
-    appinsights_key = os.getenv('APPLICATION_INSIGHTS_KEY')
-    if appinsights_key:
-        app.wsgi_app = WSGIApplication(appinsights_key, app.wsgi_app)
-        app.logger.addHandler(LoggingHandler(appinsights_key))
 
     config_path = os.getenv('OK_SERVER_CONFIG', default_config_path)
     if config_path is None:
@@ -67,6 +61,9 @@ def create_app(default_config_path=None):
                 event_id=g.sentry_event_id,
                 public_dsn=sentry.client.get_public_dsn('https')
             ), 500
+
+    # Azure Application Insights request and error tracking
+    appinsights.init_app(app)
 
     @app.errorhandler(404)
     def not_found_error(error):

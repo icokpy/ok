@@ -46,3 +46,5 @@ RQ_POLL_INTERVAL = 2000
 RQ_DEFAULT_DB = 2  # to prevent conflicts with development
 
 GOOGLE_CONSUMER_KEY = ''
+
+APPLICATION_INSIGHTS_KEY = ''
