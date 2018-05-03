@@ -282,189 +282,127 @@
   
       },
       {
-        "name": "webapp",
+        "name": "AppInsights",
         "type": "Microsoft.Resources/deployments",
         "apiVersion": "2016-09-01",
         "dependsOn": [
        
-          "[concat('Microsoft.Resources/deployments/', 'MySQL')]",
-          "[concat('Microsoft.Resources/deployments/', 'redis')]",
-          "[concat('Microsoft.Resources/deployments/', 'storage')]",
-          "[concat('Microsoft.Resources/deployments/', 'sendgrid')]",
-          "[concat('Microsoft.Resources/deployments/', 'aci-create-container')]"
+  
         ],
         "properties": {
           "mode": "Incremental",
           "templateLink": {
-            "uri": "[concat(parameters('templateBaseURL'),'webapp.deploy.json')]",
+            "uri": "[concat(parameters('templateBaseURL'),'application-insights.deploy.json')]",
        
             "contentVersion": "1.0.0.0"
           },
           "parameters": {
-            "appName": {
-              "value": "[variables('appName')]"
-              
-            },
-            "storageAccountName":{
-
-              "value": "[reference('storage').outputs.storageAccountName.value]"
-            },
-            "storageAccountKey":{
-
-              "value": "[reference('storage').outputs.storageAccountKey.value]"
-            },
-            "ok_env": {
-              "value": "[parameters('ok_env')]"
-            },
-            "dockerRegistryUrl":{
-
-              "value": "[parameters('dockerRegistryUrl')]"
-            },
-            "dockerRegistryUsername":{
-      
-              "value": "[parameters('dockerRegistryUsername')]"
-            },
-            "dockerRegistryPassword":{
-      
-              "value": "[parameters('dockerRegistryPassword')]"
-            },
-            "dockerImageName":{
-      
-              "value": "[parameters('dockerImageName')]"
-            },
-            "dockerImageTag":{
-      
-              "value": "[parameters('dockerImageTag')]"
-            },
-            "mysqlUsername": {
-              "value": "[parameters('mySqlUsername')]"
-              
-            },
-            "mysqlPassword": {
-              "value": "[parameters('mySQlAdminPassword')]"
-              
-            },
-            "mySQLServerName": {
-              "value": "[variables('mySQLServerName')]"
-    
-            },
-            "redisFQDN": {
-              "value": "[reference('redis').outputs.redis.value.hostName]"
-              
-          },
-          "redisPassword": {
-            "value": "[reference('redis').outputs.redis.value.accessKeys.primarykey]"
-            
-                
-            },
-            "sendgridSmtpServer": {
-              
-              "value": "[reference('SendGrid').outputs.SendGrid.value.smtpServer]"
-            },
-
-            "sendgridAccountName": {
-              
-              "value":  "[reference('SendGrid').outputs.SendGrid.value.username]"
-            },
-            "sendgridPassword": {
-              
-              "value":  "[parameters('sendgridPassword')]"
+            "appName":{
+              "value": "[parameters('appName')]"
             }
-          }
-        }
-      },
-        {
-        "name": "webapp",
-        "type": "Microsoft.Resources/deployments",
-        "apiVersion": "2016-09-01",
-        "dependsOn": [
-       
-          "[concat('Microsoft.Resources/deployments/', 'MySQL')]",
-          "[concat('Microsoft.Resources/deployments/', 'redis')]",
-          "[concat('Microsoft.Resources/deployments/', 'storage')]",
-          "[concat('Microsoft.Resources/deployments/', 'sendgrid')]",
-          "[concat('Microsoft.Resources/deployments/', 'aci-create-container')]"
-        ],
-        "properties": {
-          "mode": "Incremental",
-          "templateLink": {
-            "uri": "[concat(parameters('templateBaseURL'),'webapp.deploy.json')]",
-       
-            "contentVersion": "1.0.0.0"
-          },
-          "parameters": {
-            "appName": {
-              "value": "[variables('appName')]"
-              
-            },
-            "storageAccountName":{
-
-              "value": "[reference('storage').outputs.storageAccountName.value]"
-            },
-            "storageAccountKey":{
-
-              "value": "[reference('storage').outputs.storageAccountKey.value]"
-            },
-            "ok_env": {
-              "value": "[parameters('ok_env')]"
-            },
-            "dockerRegistryUrl":{
-
-              "value": "[parameters('dockerRegistryUrl')]"
-            },
-            "dockerRegistryUsername":{
-      
-              "value": "[parameters('dockerRegistryUsername')]"
-            },
-            "dockerRegistryPassword":{
-      
-              "value": "[parameters('dockerRegistryPassword')]"
-            },
-            "dockerImageName":{
-      
-              "value": "[parameters('dockerImageName')]"
-            },
-            "dockerImageTag":{
-      
-              "value": "[parameters('dockerImageTag')]"
-            },
-            "mysqlUsername": {
-              "value": "[parameters('mySqlUsername')]"
-              
-            },
-            "mysqlPassword": {
-              "value": "[parameters('mySQlAdminPassword')]"
-              
-            },
-            "mySQLServerName": {
-              "value": "[variables('mySQLServerName')]"
-    
-            },
-            "redisFQDN": {
-              "value": "[reference('redis').outputs.redis.value.hostName]"
-              
-          },
-          "redisPassword": {
-            "value": "[reference('redis').outputs.redis.value.accessKeys.primarykey]"
-            
-                
-            },
-            "sendgridSmtpServer": {
-              
-              "value": "[reference('SendGrid').outputs.SendGrid.value.smtpServer]"
-            },
-
-            "sendgridAccountName": {
-              
-              "value":  "[reference('SendGrid').outputs.SendGrid.value.username]"
-            },
-            "sendgridPassword": {
-              
-              "value":  "[parameters('sendgridPassword')]"
-            }
+  
           }
         }
   
+      },
+      {
+        "name": "webapp",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2016-09-01",
+        "dependsOn": [
+       
+          "[concat('Microsoft.Resources/deployments/', 'MySQL')]",
+          "[concat('Microsoft.Resources/deployments/', 'redis')]",
+          "[concat('Microsoft.Resources/deployments/', 'storage')]",
+          "[concat('Microsoft.Resources/deployments/', 'sendgrid')]",
+          "[concat('Microsoft.Resources/deployments/', 'AppInsights')]",
+          "[concat('Microsoft.Resources/deployments/', 'aci-create-container')]"
+        ],
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[concat(parameters('templateBaseURL'),'webapp.deploy.json')]",
+       
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "appName": {
+              "value": "[variables('appName')]"
+              
+            },
+            "storageAccountName":{
+
+              "value": "[reference('storage').outputs.storageAccountName.value]"
+            },
+            "storageAccountKey":{
+
+              "value": "[reference('storage').outputs.storageAccountKey.value]"
+            },
+            "ok_env": {
+              "value": "[parameters('ok_env')]"
+            },
+            "dockerRegistryUrl":{
+
+              "value": "[parameters('dockerRegistryUrl')]"
+            },
+            "dockerRegistryUsername":{
+      
+              "value": "[parameters('dockerRegistryUsername')]"
+            },
+            "dockerRegistryPassword":{
+      
+              "value": "[parameters('dockerRegistryPassword')]"
+            },
+            "dockerImageName":{
+      
+              "value": "[parameters('dockerImageName')]"
+            },
+            "dockerImageTag":{
+      
+              "value": "[parameters('dockerImageTag')]"
+            },
+            "mysqlUsername": {
+              "value": "[parameters('mySqlUsername')]"
+              
+            },
+            "mysqlPassword": {
+              "value": "[parameters('mySQlAdminPassword')]"
+              
+            },
+            "mySQLServerName": {
+              "value": "[variables('mySQLServerName')]"
+    
+            },
+            "redisFQDN": {
+              "value": "[reference('redis').outputs.redis.value.hostName]"
+              
+          },
+          "redisPassword": {
+            "value": "[reference('redis').outputs.redis.value.accessKeys.primarykey]"
+            
+                
+            },
+            "sendgridSmtpServer": {
+              
+              "value": "[reference('SendGrid').outputs.SendGrid.value.smtpServer]"
+            },
+
+            "sendgridAccountName": {
+              
+              "value":  "[reference('SendGrid').outputs.SendGrid.value.username]"
+            },
+            "sendgridPassword": {
+              
+              "value":  "[parameters('sendgridPassword')]"
+            },
+            "applicationInsightsKey":{
+
+              "value":  "[reference('AppInsights').outputs.AppInsights.value.key]"
+                
+              
+            }
+          }
+        }
       },
       {
         "name": "worker",
@@ -476,6 +414,7 @@
           "[concat('Microsoft.Resources/deployments/', 'redis')]",
           "[concat('Microsoft.Resources/deployments/', 'storage')]",
           "[concat('Microsoft.Resources/deployments/', 'sendgrid')]",
+          "[concat('Microsoft.Resources/deployments/', 'AppInsights')]",
           "[concat('Microsoft.Resources/deployments/', 'aci-create-container')]"
         ],
         "properties": {
@@ -487,7 +426,7 @@
           },
           "parameters": {
             "appName": {
-              "value": "[variables('appName')]"
+              "value": "[concat(variables('appName'),'-worker')]"
               
             },
             "storageAccountName":{
@@ -558,6 +497,12 @@
             "sendgridPassword": {
               
               "value":  "[parameters('sendgridPassword')]"
+            },
+            "applicationInsightsKey":{
+
+              "value":  "[reference('AppInsights').outputs.AppInsights.value.key]"
+                
+              
             }
           }
         }

@@ -108,6 +108,13 @@
                       "description": "SendGrid  password"
                     }
                   
+              },
+              "applicationInsightsKey":{
+
+                "type": "string",
+                  "metadata": {
+                    "description": "Application Insights Key"
+                  }
               }
     },
   "variables": {
@@ -182,7 +189,8 @@
                                "sendgridSmtpServer": "[parameters('sendgridSmtpServer')]",
                                "sendgridUsername": "[parameters('sendgridAccountName')]",
                                "sendgridPassword": "[parameters('sendgridPassword')]",
-                               "WEBSITE_HTTPLOGGING_RETENTION_DAYS": "7"
+                               "WEBSITE_HTTPLOGGING_RETENTION_DAYS": "7",
+                               "APPLICATION_INSIGHTS_KEY":"[parameters('applicationInsightsKey')]"
                             }
                         },
                         {
