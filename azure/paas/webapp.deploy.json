@@ -125,6 +125,13 @@
                   "metadata": {
                     "description": "Application Insights Key"
                   }
+              },
+              "SecretKey":{
+
+                "type": "securestring",
+                  "metadata": {
+                    "description": "Secret Key"
+                  }
               }
     },
   "variables": {
@@ -195,14 +202,13 @@
                                "STORAGE_SECRET":"[parameters('storageAccountKey')]",
                                "STORAGE_CONTAINER":"okpyfiles",
                                "OK_ENV":"[parameters('ok_env')]",
-                               "toAddress": "",
-                               "sendgridSmtpServer": "[parameters('sendgridSmtpServer')]",
-                               "sendgridUsername": "[parameters('sendgridAccountName')]",
-                               "sendgridPassword": "[parameters('sendgridPassword')]",
+                               "SENDGRID_USER": "[parameters('sendgridAccountName')]",
+                               "SENDGRID_KEY": "[parameters('sendgridPassword')]",
                                "WEBSITE_HTTPLOGGING_RETENTION_DAYS": "7",
                                "APPLICATION_INSIGHTS_KEY":"[parameters('applicationInsightsKey')]",
                                "MICROSOFT_APP_SECRET":"[parameters('azureAdAppSecret')]",
-                               "MICROSOFT_APP_ID":"[parameters('azureAdAppId')]"
+                               "MICROSOFT_APP_ID":"[parameters('azureAdAppId')]",
+                               "SECRET_KEY":"[parameters('SecretKey')]"
                             }
                         },
                         {

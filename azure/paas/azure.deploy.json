@@ -71,6 +71,12 @@
           "description": "Sendgrid password"
         }
       },
+      "SecretKey": {
+        "type": "securestring",
+        "metadata": {
+          "description": "SecretKey"
+        }
+      },
       "appName": {
         "type": "string",
         "metadata": {
@@ -416,6 +422,10 @@
             "azureAdAppSecret":{
               "value":"[parameters('azureAdAppSecret')]"
                   
+            },
+            "SecretKey":{
+              "value":"[parameters('SecretKey')]"
+                  
             }
        
           }
@@ -520,6 +530,10 @@
               "value":  "[reference('AppInsights').outputs.AppInsights.value.InstrumentationKey]"
                 
               
+            },
+            "SecretKey":{
+              "value":"[parameters('SecretKey')]"
+                  
             }
           }
         }
