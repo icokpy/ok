@@ -3,8 +3,6 @@
    Jenkins instance at: http://ok-jenkins.uksouth.cloudapp.azure.com/ 
 */
 
-String dockerTag = "${env.BUILD_TAG}".toLowerCase().replaceAll("[^\\p{IsAlphabetic}^\\p{IsDigit}]", "-")
-
 // Run in declarative pipeline
 pipeline {
      // Agent will be specified per-stage
@@ -18,22 +16,37 @@ pipeline {
                // Docker and native builds are independent of each other
                parallel {
                     stage('OK docker') {
-                         // Build from default dockerfile
-                         agent { 
-                              dockerfile { 
-                                   label 'linux'
-                                   additionalBuildArgs "-t ${dockerTag}"
+                         agent { label 'linux' }
+                         steps {
+                              // docker methods need to drop into scripted pipeline    
+                              script {
+
+                                   if ( env.BRANCH_NAME == 'master' ) {
+                                        dockerTag = "icokpy-${env.BUILD_NUMBER}"
+                                   } else {
+                                        dockerTag = "${env.BUILD_TAG}".toLowerCase().replaceAll("[^\\p{IsAlphabetic}^\\p{IsDigit}]", "-")
+                                   }
+
+                                   def okImage = docker.build("${dockerTag}")
+
+                                   okImage.inside() {
+                                        sh 'py.test tests/ --ignore=tests/test_job.py'
+                                   }                          
+
+                                   if ( env.BRANCH_NAME == 'master' ) {
+
+                                        docker.withRegistry('https://icokpy.azurecr.io', 'icokpy-registry-credentials') {
+                                             okImage = docker.image("icokpy-${env.BUILD_NUMBER}")
+                                             okImage.push()
+                                        }
+
+                                   }
                               }
-                         }    
-                         steps { 
-                              sh 'py.test tests/ --ignore=tests/test_job.py'
                          }
                     }
-                    stage('OK native on Quantal') {
-                         // Original OK uses trusty; Azure uses Quantal
-                         agent { 
-                              label 'linux' 
-                         }
+
+                    stage('OK native') {
+                         agent { label 'linux' }
                          steps {
                               sh 'sudo apt-get update'
                               // Required for pip and later installs
@@ -46,22 +59,8 @@ pipeline {
                               sh 'py.test tests/ --ignore=tests/test_job.py'
                               sh 'py.test --cov-report term-missing --cov=server tests/  --ignore tests/test_web.py --timeout=30'
                          }
-                     }
-               }
-          }
-     }
-     post {  
-          success {  
-               script {
-                    if ( env.BRANCH_NAME == 'master' ) {
-                         docker.withRegistry('https://icokpy.azurecr.io', 'icokpy-registry-credentials') {
-                          def deployImage = docker.image("${dockerTag}")
-                              deployImage.push("deployment:${dockerTag}")
-                              deployImage.push('deployment:latest')
-                         }
                     }
                }
           }
      }
- 
 }
