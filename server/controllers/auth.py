@@ -39,7 +39,7 @@ def record_params(setup_state):
     global provider_name
     global provider_auth
     app = setup_state.app
-    provider_name = app.config.get('OAUTH_PROVIDER', None)
+    provider_name = app.config.get('OAUTH_PROVIDER', 'GOOGLE')
     if provider_name is not None:
         provider_auth = oauth.remote_app(
             provider_name, 
