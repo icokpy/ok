@@ -39,14 +39,17 @@ def record_params(setup_state):
     global provider_name
     global provider_auth
     app = setup_state.app
-    provider_name = app.config.get('OAUTH_PROVIDER')
-    provider_auth = oauth.remote_app(
-        provider_name, 
-        app_key=provider_name # TODO: None fail check.
-    )
+    provider_name = app.config.get('OAUTH_PROVIDER', None)
+    if provider_name is not None:
+        provider_auth = oauth.remote_app(
+            provider_name, 
+            app_key=provider_name # TODO: None fail check.
+        )
+        provider_auth._tokengetter = provider_token
+
     oauth.init_app(app)
     #instead of decorator set the fn pointer to the func here
-    provider_auth._tokengetter = provider_token
+   
 
 
 def provider_token(token=None):
