@@ -93,8 +93,12 @@ class GoogleCloudTestFile(CloudTestFile):
 
 class AzureBlobTestFile(CloudTestFile):
     storage_provider = "AZURE_BLOBS"
+
+    # this is the storage account name in the Azure Portal
     key_env_name = "AZURE_STORAGE_KEY"
+    # this is the storage account key in the Azure Portal
     secret_env_name = "AZURE_STORAGE_SECRET"
+
     container_env_name = "AZURE_STORAGE_CONTAINER"
 
     def test_simple(self):
