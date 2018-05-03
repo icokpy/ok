@@ -1,5 +1,6 @@
 import os
 
+from applicationinsights.logging import LoggingHandler
 from applicationinsights.requests import WSGIApplication
 from flask import Flask, render_template, g, request
 from flask_rq import RQ
@@ -42,6 +43,7 @@ def create_app(default_config_path=None):
     appinsights_key = os.getenv('APPLICATION_INSIGHTS_KEY')
     if appinsights_key:
         app.wsgi_app = WSGIApplication(appinsights_key, app.wsgi_app)
+        app.logger.addHandler(LoggingHandler(appinsights_key))
 
     config_path = os.getenv('OK_SERVER_CONFIG', default_config_path)
     if config_path is None:
