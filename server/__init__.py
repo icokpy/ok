@@ -1,5 +1,5 @@
 import os
-
+import atexit
 from flask import Flask, render_template, g, request
 from flask_rq import RQ
 from webassets.loaders import PythonLoader as PythonAssetsLoader
@@ -74,6 +74,10 @@ def create_app(default_config_path=None):
     @app.route("/healthz")
     def health_check():
         return 'OK'
+
+    @atexit.register
+    def exit_handler():
+        appinsights.flush()
 
     # initialize the cache
     cache.init_app(app)
