@@ -16,7 +16,7 @@ pipeline {
                // Docker and native builds are independent of each other
                parallel {
                     stage('OK docker') {
-                         agent { label 'linux' }
+                         agent { label 'azure-linux' }
                          steps {
                               // docker methods need to drop into scripted pipeline    
                               script {
@@ -46,7 +46,7 @@ pipeline {
                     }
 
                     stage('OK native') {
-                         agent { label 'linux' }
+                         agent { label 'azure-linux' }
                          steps {
                               sh 'sudo apt-get update'
                               // Required for pip and later installs
