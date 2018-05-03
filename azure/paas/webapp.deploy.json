@@ -57,10 +57,12 @@
       "type": "string"
      },
      "azureAdAppID":{
+       "defaultValue": "",
       "type": "string"
   
     },
     "azureAdAppSecret":{
+      "defaultValue": "",
       "type": "string"
           
     },
