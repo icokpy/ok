@@ -109,4 +109,5 @@ class AzureBlobTestFile(CloudTestFile):
         """
         raise unittest.SkipTest(reason) 
 
+
 del CloudTestFile, TestFile
