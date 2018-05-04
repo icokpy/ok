@@ -26,9 +26,12 @@ GOOGLE = dict(
 MICROSOFT = dict(
     consumer_key=os.getenv('MICROSOFT_APP_ID'), # TODO: make these generic across provider
 	consumer_secret=os.getenv('MICROSOFT_APP_SECRET'),
+    tenent_id=os.getenv('MICROSOFT_TENANT_ID', 'common'),
     base_url='https://management.azure.com',
     request_token_url=None,
     access_token_method='POST',
-    access_token_url='https://login.microsoftonline.com/common/oauth2/token',
-    authorize_url='https://login.microsoftonline.com/common/oauth2/authorize?resource=c0bbcec8-3f72-4e97-941c-1950300696b6' #?resource=https://management.azure.com/'
+    access_token_url='https://login.microsoftonline.com/{tenant_id}/oauth2/token' \
+        .format(tenant_id=os.getenv('MICROSOFT_TENANT_ID', 'common')),
+    authorize_url='https://login.microsoftonline.com/{tenant_id}/oauth2/authorize?resource={application_id}' \
+        .format( application_id=os.getenv('MICROSOFT_APP_ID'), tenant_id=os.getenv('MICROSOFT_TENANT_ID', 'common'))
 )
