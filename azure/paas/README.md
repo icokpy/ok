@@ -1,19 +1,22 @@
 # Deploy to Azure PaaS
 
-These templates deploy Ok.py to Azure. 
+These templates deploy Ok.py to Azure. In a production environment you may wish to customize these templates to share resources between environments and to adjust resource sizing. For example you may wish to use a single mySQL server with multiple databases, rather than one server per environment.
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ficokpy%2Fok%2Fmaster%2Fazure%2Fpaas%2Fazure.deploy.json" target="_blank">
+    <img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
 
 ## Architecture
 
+![Azure PaaS Architecture](./img/arch.PNG)
+
 
 ## Accept SendGrid Terms
-
+Prior to deploying the tempkate 
 Using PowerShell:
 
 ''' Get-AzureRmMarketplaceTerms -Publisher "sendgrid" -Product "sendgrid_azure" -Name "free" | Set-AzureRmMarketplaceTerms -Accept '''
 
-Can be run in the cloud shell.
+This can be run in the cloud shell.
 
 
 
-## ACI 
-az container create -g tmpOK --name okaci7 --image marrobi/ok:latest --cpu 2 --memory 3 --port 5000  --ip-address Public -e DATABASE_URL="mysql://adminmarcus%40tmpmrsql:Password1234@tmpmrsql.mysql.database.azure.com:3306/ok" REDIS_HOST="tmpmrredis.redis.cache.windows.net" REDIS_PASSWORD="K8jJnnD4N8TTEkrkyQKo3lZlIa33ol0MGOqK81x4K/Y=" OK_ENV="prod"

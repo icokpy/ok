@@ -33,6 +33,20 @@
               "-c",
               "az storage container create --account-name=$STORAGE_ACCOUNT_NAME --account-key=$STORAGE_KEY --name=$STORAGE_CONTAINER_NAME"
             ],
+            "environmentVariables": [
+              {
+                "name": "STORAGE_CONTAINER_NAME",
+                "value": "[parameters('storageContainerName')]"
+              },
+              {
+                "name": "STORAGE_ACCOUNT_NAME",
+                "value": "[parameters('storageAccountName')]"
+              },
+              {
+                "name": "STORAGE_KEY",
+                "value": "[parameters('storageAccountKey')]"
+              }
+            ],
             "resources": {
               "requests": {
                 "cpu": 1,

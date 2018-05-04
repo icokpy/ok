@@ -5,6 +5,9 @@
       "appName": {
         "value":"mrokpy"
       }, 
+      "ok_env": {
+        "value": "simple"
+      },      
       "mySqlUsername": {
            "value":"adminmarcus"
         },
@@ -18,7 +21,7 @@
             "value":"Password1234"
           },
           "templateBaseURL": {
-            "value":"https://raw.githubusercontent.com/icokpy/ok/enhancement/icokpy/azure-deploy/azure/paas/"
+            "value":"https://raw.githubusercontent.com/icokpy/ok/enhancement/icokpy/azure-tempaltes/azure/paas/"
           },
           "dockerRegistryUsername":{
 
@@ -35,7 +38,23 @@
           "dockerImageName":{
 
             "value":""
-          }
+          },
+          "dockerImageTag":{
+
+            "value":"oauth"
+          },
+          "azureAdAppID":{
+            "value": ""
+          },
+          "azureAdAppSecret":{
+
+            "value": ""
+          },
+            "SecretKey":{
+              "value":""
+                  
+            }
+         
     }
   }
 
