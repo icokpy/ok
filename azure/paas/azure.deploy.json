@@ -448,7 +448,6 @@
           "[concat('Microsoft.Resources/deployments/', 'MySQL')]",
           "[concat('Microsoft.Resources/deployments/', 'redis')]",
           "[concat('Microsoft.Resources/deployments/', 'storage')]",
-          "[concat('Microsoft.Resources/deployments/', 'sendgrid')]",
           "[concat('Microsoft.Resources/deployments/', 'AppInsights')]",
           "[concat('Microsoft.Resources/deployments/', 'aci-create-container')]"
         ],
@@ -522,7 +521,7 @@
             },
                        "sendgridAccountName": {
               
-              "value":  "[reference('SendGrid').outputs.SendGrid.value.username]"
+              "value":  "[parameters('sendgridAccountName')]"
             },
             "sendgridPassword": {
               
