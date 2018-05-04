@@ -97,7 +97,7 @@
     },
   "variables": {
     "mySQLServerName": "[concat('okpy',uniquestring(resourceGroup().id))]",
-    "appName": "[concat(parameters('appName'),uniquestring(resourceGroup().id))]"
+    "uniqueAppName": "[concat(parameters('appName'),uniquestring(resourceGroup().id))]"
     
   },
     "resources": [
@@ -345,7 +345,7 @@
           },
           "parameters": {
             "appName": {
-              "value": "[variables('appName')]"
+              "value": "[parameters('appName')]"
               
             },
             "storageAccountName":{
@@ -456,7 +456,7 @@
           },
           "parameters": {
             "appName": {
-              "value": "[concat(variables('appName'),'-worker')]"
+              "value": "[concat(parameters('appName'),'-worker')]"
               
             },
             "storageAccountName":{
