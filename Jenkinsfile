@@ -25,7 +25,8 @@ pipeline {
                                    def version = sh script: 'git rev-parse --short HEAD | tr -d "\n"', returnStdout: true
                                    def imageName = "icokpy"
                                    def imageTag = "${env.BUILD_NUMBER}_${version}"
-                                   def acrUrl = 'https://icokpy.azurecr.io'
+                                   def acrHost = 'icokpy.azurecr.io'
+                                   def acrUrl = "https://${acrHost}"
                                    def location = 'westeurope'
                                    def webAppName = 'icokpy'
                                    def webAppResourceGroup = "icokpy-dev-${location}"
@@ -66,14 +67,14 @@ pipeline {
                                                        --parameters mySqlUsername=${mysqlUser} --parameters mySqlAdminPassword=${mysqlPass} \
                                                        --parameters sendgridAccountName=${sendgridUser} --parameters sendgridPassword=${sendgridPass} \
                                                        --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
-                                                       --parameters dockerRegistryUrl=$acrUrl --parameter appName='icokpy-dev' --parameter ok_env='dev' \
+                                                       --parameters dockerRegistryUrl=${acrHost} --parameter appName='icokpy-dev' --parameter ok_env='dev' \
                                                        --parameters templateBaseURL=https://raw.githubusercontent.com/icokpy/ok/master/azure/paas/ || true
                                                      az group deployment create --resource-group ${webAppResourceGroup} --template-file azure/paas/azure.deploy.json \
                                                        --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName}:${imageTag} \
                                                        --parameters mySqlUsername=${mysqlUser} --parameters mySqlAdminPassword=${mysqlPass} \
                                                        --parameters sendgridAccountName=${sendgridUser} --parameters sendgridPassword=${sendgridPass} \
                                                        --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
-                                                       --parameters dockerRegistryUrl=$acrUrl --parameter appName='icokpy-dev' --parameter ok_env='dev' \
+                                                       --parameters dockerRegistryUrl=${acrHost} --parameter appName='icokpy-dev' --parameter ok_env='dev' \
                                                        --parameters templateBaseURL=https://raw.githubusercontent.com/icokpy/ok/master/azure/paas/
                                                       
                                                    """
