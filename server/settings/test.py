@@ -1,5 +1,7 @@
 import os
 
+from server.settings import GOOGLE, MICROSOFT
+
 ENV = 'test'
 SECRET_KEY = os.getenv('OK_SESSION_KEY', 'testkey')
 
@@ -30,6 +32,7 @@ sql_ca_cert = os.getenv('SQL_CA_CERT')
 azure_uri = "azure"
 if sql_ca_cert and azure_uri in SQLALCHEMY_DATABASE_URI:
     SQLALCHEMY_ENGINE_OPTS = {'connect_args': {'ssl': {'ca': sql_ca_cert}}}
+    SQLALCHEMY_POOL_RECYCLE = 25 * 60
 
 WTF_CSRF_CHECK_DEFAULT = False
 WTF_CSRF_ENABLED = False

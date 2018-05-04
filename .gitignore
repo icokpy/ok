@@ -45,3 +45,5 @@ _cache/*
 database.db
 *.db
 *.db-journal
+
+**/.vscode/**
