@@ -16,37 +16,66 @@ pipeline {
                // Docker and native builds are independent of each other
                parallel {
                     stage('OK docker') {
-                         agent { label 'linux' }
+                         agent { label 'azure-linux' }
                          steps {
                               // docker methods need to drop into scripted pipeline    
                               script {
 
-                                   if ( env.BRANCH_NAME == 'master' ) {
-                                        dockerTag = "icokpy-${env.BUILD_NUMBER}"
-                                   } else {
-                                        dockerTag = "${env.BUILD_TAG}".toLowerCase().replaceAll("[^\\p{IsAlphabetic}^\\p{IsDigit}]", "-")
-                                   }
+                                   // generate version, it's important to remove the trailing new line in git describe output
+                                   def version = sh script: 'git rev-parse --short HEAD | tr -d "\n"', returnStdout: true
+                                   def imageName = "icokpy"
+                                   def acrUrl = 'https://icokpy.azurecr.io'
+                                   def webAppResourceGroup = 'icokpy-deployment'
+                                   def webAppName = 'icokpy'
 
-                                   def okImage = docker.build("${dockerTag}")
+                                   def okImage = docker.build("${imageName}:${env.BUILD_NUMBER}_${version}")
 
                                    okImage.inside() {
                                         sh 'py.test tests/ --ignore=tests/test_job.py'
                                    }                          
 
                                    if ( env.BRANCH_NAME == 'master' ) {
-
-                                        docker.withRegistry('https://icokpy.azurecr.io', 'icokpy-registry-credentials') {
-                                             okImage = docker.image("icokpy-${env.BUILD_NUMBER}")
+                                        // Push the new image to acr
+                                        docker.withRegistry("${acrUrl}", 'icokpy-registry-credentials') {
                                              okImage.push()
+                                             okImage.push("latest")
                                         }
 
+                                        // Install azure-cli tools on the build slave
+                                        sh 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ xenial main" | sudo tee /etc/apt/sources.list.d/azure-cli.list'
+                                        sh 'sudo apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893'
+                                        sh 'curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -'
+                                        sh 'sudo apt-get -y install apt-transport-https'
+                                        sh 'sudo apt-get update && sudo apt-get -y install azure-cli'
+
+                                        // Deploy
+                                        withCredentials([azureServicePrincipal('jenkins-service-principal')]) {
+                                             sh "az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID"
+                                             sh "az account set -s $AZURE_SUBSCRIPTION_ID"
+                                             sh "az group create --name ${webAppResourceGroup} --location 'UK South'"
+                                             withCredentials([usernamePassword(credentialsId: 'icokpy-mysql-credentials', usernameVariable: 'mysqlUser', passwordVariable: 'mysqlPass')]) {
+                                               withCredentials([usernamePassword(credentialsId: 'icokpy-sendgrid', usernameVariable: 'sendgridUser', passwordVariable: 'sendgridPass')]) {
+                                                 withCredentials([usernamePassword(credentialsId: 'icokpy-registry-credentials', usernameVariable: 'acrUser', passwordVariable: 'acrPass')]) {
+                                                   sh """
+                                                     az group deployment create --resource-group ${webAppResourceGroup} --template-file azure/paas/azure.deploy.json \
+                                                       --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName}:${version} \
+                                                       --parameters mySqlUsername=${mysqlUser} --parameters mySqlAdminPassword=${mysqlPass} \
+                                                       --parameters sendgridAccountName=${sendgridUser} --parameters sendgridPassword=${sendgridPass} \
+                                                       --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
+                                                       --parameters dockerRegistryUrl=$acrUrl --parameter appName='icokpy-dev'
+                                                   """
+                                                 }
+                                               }
+                                             }
+                                             sh 'az logout'
+                                        }
                                    }
                               }
                          }
                     }
 
                     stage('OK native') {
-                         agent { label 'linux' }
+                         agent { label 'azure-linux' }
                          steps {
                               sh 'sudo apt-get update'
                               // Required for pip and later installs
@@ -56,7 +85,6 @@ pipeline {
                               sh 'curl https://bootstrap.pypa.io/get-pip.py | sudo python3'
                               sh 'sudo pip install -r requirements.txt'
                               sh 'sudo pip install pytest-timeout python-coveralls'
-                              sh 'py.test tests/ --ignore=tests/test_job.py'
                               sh 'py.test --cov-report term-missing --cov=server tests/  --ignore tests/test_web.py --timeout=30'
                          }
                     }

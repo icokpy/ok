@@ -5,6 +5,7 @@ import os
 import sys
 
 from server.settings import RAVEN_IGNORE_EXCEPTIONS
+from server.settings import GOOGLE, MICROSOFT
 
 ENV = 'prod'
 PREFERRED_URL_SCHEME = 'https'
@@ -41,6 +42,7 @@ sql_ca_cert = os.getenv('SQL_CA_CERT')
 azure_uri = "azure"
 if sql_ca_cert and azure_uri in SQLALCHEMY_DATABASE_URI:
     SQLALCHEMY_ENGINE_OPTS = {'connect_args': {'ssl': {'ca': sql_ca_cert}}}
+    SQLALCHEMY_POOL_RECYCLE = 25 * 60
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SENTRY_USER_ATTRS = ['email', 'name']
@@ -66,19 +68,17 @@ STORAGE_CONTAINER = os.environ.get('STORAGE_CONTAINER',  'ok-v3-user-files')
 STORAGE_KEY = os.environ.get('STORAGE_KEY', '')
 STORAGE_SECRET = os.environ.get('STORAGE_SECRET', '').replace('\\n', '\n')
 
-try:
-    os.environ["GOOGLE_ID"]
-    os.environ["GOOGLE_SECRET"]
-except KeyError:
-    print("Please set the google login variables.")
+# TODO: NEW OAUTH SETTINGS
+
+if "GOOGLE_ID" in os.environ or "GOOGLE_SECRET" in os.environ:
+    OAUTH_PROVIDER='GOOGLE'
+elif "MICROSOFT_APP_ID" in os.environ or "MICROSOFT_APP_SECRET" in os.environ:
+    OAUTH_PROVIDER='MICROSOFT'
+else:
+    print("Please set the Google or Microsoft OAuth ID and Secret variables.")
     sys.exit(1)
-
-# Service Keys
-
-GOOGLE = {
-    'consumer_key': os.environ.get('GOOGLE_ID'),
-    'consumer_secret':  os.environ.get('GOOGLE_SECRET')
-}
+        
+########
 
 SENDGRID_AUTH = {
     'user': os.environ.get("SENDGRID_USER"),
