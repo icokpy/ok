@@ -60,8 +60,8 @@ pipeline {
                                                withCredentials([usernamePassword(credentialsId: 'icokpy-sendgrid', usernameVariable: 'sendgridUser', passwordVariable: 'sendgridPass')]) {
                                                  withCredentials([usernamePassword(credentialsId: 'icokpy-registry-credentials', usernameVariable: 'acrUser', passwordVariable: 'acrPass')]) {
                                                    withCredentials([usernamePassword(credentialsId: 'icokpy-azure-app-id', usernameVariable: 'azureAdAppID', passwordVariable: 'azureAdAppSecret')]) {
-                                                     // Horrible hack - the first deployment will fail with resources not yet available. so we need to ignore
-                                                     // the error exit state and force clean exit with '|| true'
+                                                     // Horrible hack - the first deployment is expected to fail with resources not yet available. so we need to
+                                                     // re-run if the first deployment fails.
                                                      sh """
                                                        az group deployment create --resource-group ${webAppResourceGroup} --template-file azure/paas/azure.deploy.json \
                                                          --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName} \
@@ -71,7 +71,7 @@ pipeline {
                                                          --parameters dockerRegistryUrl=${acrHost} --parameter uniqueAppName='icokpy-dev' --parameter OkPyEnvironment='dev' \
                                                          --parameters templateBaseURL=https://raw.githubusercontent.com/icokpy/ok/master/azure/paas/ \
                                                          --parameters azureAdAppID=${azureAdAppID} --parameters azureAdAppSecret=${azureAdAppSecret} \
-                                                         --parameters azureAdTenantID='ImperialLondon.onmicrosoft.com' || true
+                                                         --parameters azureAdTenantID='ImperialLondon.onmicrosoft.com' || \
                                                        az group deployment create --resource-group ${webAppResourceGroup} --template-file azure/paas/azure.deploy.json \
                                                          --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName} \
                                                          --parameters dockerImageTag=${imageTag} --parameters mySqlUsername=${mysqlUser}  \
