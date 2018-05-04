@@ -6,10 +6,10 @@
         "type": "string",
         "minLength": 1,
         "metadata": {
-          "description": "Unique name for site"
+        "description": "Unique name for site - used in URLs"
         }
       },
-      "ok_env": {
+      "OkPyEnvironment": {
         "type": "string",
         "defaultValue": "dev",
         "allowedValues": [
@@ -20,16 +20,20 @@
           "prod"        
         ],
         "metadata": {
-          "description": "Unique name for site"
+          "description": "The Ok.py settings file to use"
         }
       },
       "dockerRegistryUrl":{
 
-        "type": "string"
+        "type": "string",
+        "metadata": {
+          "description": "Docker registry to pull the OK.py image from"
+        }
       },
       "dockerRegistryUsername":{
 
         "type": "string"
+        
       },
       "dockerRegistryPassword":{
 
@@ -199,7 +203,7 @@
                                "STORAGE_KEY":"[parameters('storageAccountName')]",
                                "STORAGE_SECRET":"[parameters('storageAccountKey')]",
                                "STORAGE_CONTAINER":"okpyfiles",
-                               "OK_ENV":"[parameters('ok_env')]",
+                               "OK_ENV":"[parameters('OkPyEnvironment')]",
                                "SENDGRID_USER": "[parameters('sendgridAccountName')]",
                                "SENDGRID_KEY": "[parameters('sendgridPassword')]",
                                "WEBSITE_HTTPLOGGING_RETENTION_DAYS": "7",
