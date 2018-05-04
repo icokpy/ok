@@ -2,89 +2,108 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "ok_env": {
+          
+      "uniqueAppName": {
+        "type": "string",
+        "minLength": 1,
+        "metadata": {
+          "description": "Application name, used in URLs, must be unique across Azure"
+        }
+      },
+      "OkPyEnvironment": {
         "type": "string",
         "defaultValue": "dev",
         "allowedValues": [
           "dev",
           "simple",
-           "test",
-            "staging",
+          "test",
+          "staging",
           "prod"        
         ],
         "metadata": {
-          "description": "ok.py settings file"
+          "description": "The Ok.py settings file to use"
         }
       },
       "dockerRegistryUrl":{
         "defaultValue": "quay.io",
-        "type": "string"
+        "type": "string",
+        "metadata": {
+          "description": "The Docker registry to pull the Ok.py image from"
+        }
       },
       "dockerRegistryUsername":{
         "defaultValue": "",
-        "type": "string"
+        "type": "string",
+        "metadata": {
+          "description": "Optional Docker registry user account"
+        }
       },
       "dockerRegistryPassword":{
         "defaultValue": "",
-        "type": "string"
+        "type": "string",
+        "metadata": {
+          "description": "Optional Docker registry password"
+        }
       },
       "dockerImageName":{
+        "minLength": 1,
         "defaultValue": "cs61a/ok-server",
-        "type": "string"
+        "type": "string",
+        "metadata": {
+          "description": "Ok.py Docker image"
+        }
       },
       "dockerImageTag":{
+        "minLength": 1,
         "defaultValue": "latest",
-        "type": "string"
+        "type": "string",
+        "metadata": {
+          "description": "Ok.py Docker image Tag"
+        }
       },
       "azureAdAppID":{
         "defaultValue":"",
-        "type": "string"
+        "type": "string",
+        "metadata": {
+          "description": "Requried to integrate with Azure AD for user access"
+        }
       },
       "azureAdAppSecret":{
         "defaultValue":"",
-              "type": "string"
+        "type": "string",
+        "metadata": {
+          "description": "Requried to integrate with Azure AD for user access"
+        }
       },
       "azureAdTenantID":{
 
         "defaultValue":"",
-        "type": "string"
+        "type": "string",
+        "metadata": {
+          "description": "Requried to integrate with Azure AD for user access"
+        }
       },
       "mySqlUsername": {
         "type": "string",
         "minLength": 1,
         "defaultValue" : "mysqladmin",
         "metadata": {
-          "description": "MySQL Username"
+          "description": "MySQL Username - will be needed to configure Ok.py admin via MySQL"
         }
       },
       "mySqlAdminPassword": {
         "type": "securestring",
+        "minLength": 1,
         "metadata": {
-          "description": "mySQL Admin Password"
+          "description": "mySQL Admin Password - will be needed to configure Ok.py admin via MySQL"
         }
       },
-      "sendgridAccountName": {
-        "type": "string",
-        "metadata": {
-          "description": "sendgrid account name"
-        }
-      },
+     
       "sendgridPassword": {
-        "type": "string",
+        "type": "securestring",
+        "minLength": 1,
         "metadata": {
           "description": "Sendgrid password"
-        }
-      },
-      "SecretKey": {
-        "type": "securestring",
-        "metadata": {
-          "description": "SecretKey"
-        }
-      },
-      "appName": {
-        "type": "string",
-        "metadata": {
-          "description": "Unique application Name"
         }
       },
       "templateBaseURL": {
@@ -95,11 +114,12 @@
         }
       }
     },
-  "variables": {
-    "mySQLServerName": "[concat('okpy',uniquestring(resourceGroup().id))]",
-    "uniqueAppName": "[concat(parameters('appName'),uniquestring(resourceGroup().id))]"
-    
-  },
+    "variables": {
+      "mySQLServerName": "[concat('mysql',parameters('uniqueAppName'))]",
+      "secretKey":"[uniqueString('mySqlAdminPassword')]",
+      "sendgridAccountName": "[concat('sendgrid',parameters('uniqueAppName'))]"
+      
+    },
     "resources": [
       
       {
@@ -171,7 +191,7 @@
           },
           "parameters": {
             "sendgridAccountName":{
-              "value": "[parameters('sendgridAccountName')]"
+              "value": "[variables('sendgridAccountName')]"
             },
             "sendgridPassword": {
               "value": "[parameters('sendgridPassword')]"
@@ -316,7 +336,7 @@
           },
           "parameters": {
             "appName":{
-              "value": "[parameters('appName')]"
+              "value": "[parameters('uniqueAppName')]"
             }
   
           }
@@ -345,7 +365,7 @@
           },
           "parameters": {
             "appName": {
-              "value": "[parameters('appName')]"
+              "value": "[parameters('uniqueAppName')]"
               
             },
             "storageAccountName":{
@@ -356,8 +376,8 @@
 
               "value": "[reference('storage').outputs.storageAccountKey.value]"
             },
-            "ok_env": {
-              "value": "[parameters('ok_env')]"
+            "OkPyEnvironment": {
+              "value": "[parameters('OkPyEnvironment')]"
             },
             "dockerRegistryUrl":{
 
@@ -427,7 +447,7 @@
                   
             },
             "SecretKey":{
-              "value":"[parameters('SecretKey')]"
+              "value":"[variables('secretKey')]"
                   
             }
        
@@ -456,7 +476,7 @@
           },
           "parameters": {
             "appName": {
-              "value": "[concat(parameters('appName'),'-worker')]"
+              "value": "[concat(parameters('uniqueAppName'),'-worker')]"
               
             },
             "storageAccountName":{
@@ -467,8 +487,8 @@
 
               "value": "[reference('storage').outputs.storageAccountKey.value]"
             },
-            "ok_env": {
-              "value": "[parameters('ok_env')]"
+            "OkPyEnvironment": {
+              "value": "[parameters('OkPyEnvironment')]"
             },
             "dockerRegistryUrl":{
 
@@ -530,7 +550,7 @@
               
             },
             "SecretKey":{
-              "value":"[parameters('SecretKey')]"
+              "value":"[variables('secretKey')]"
                   
             }
           }
