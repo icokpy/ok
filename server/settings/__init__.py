@@ -32,6 +32,12 @@ MICROSOFT = dict(
     access_token_method='POST',
     access_token_url='https://login.microsoftonline.com/{tenant_id}/oauth2/token' \
         .format(tenant_id=os.getenv('MICROSOFT_TENANT_ID', 'common')),
-    authorize_url='https://login.microsoftonline.com/{tenant_id}/oauth2/authorize?resource={application_id}' \
-        .format( application_id=os.getenv('MICROSOFT_APP_ID'), tenant_id=os.getenv('MICROSOFT_TENANT_ID', 'common'))
+    authorize_url='https://login.microsoftonline.com/{tenant_id}/oauth2/authorize' \
+        .format(tenant_id=os.getenv('MICROSOFT_TENANT_ID', 'common')),
+        request_token_params={
+        'resource' : os.getenv('MICROSOFT_APP_ID'),
+        'response_mode' : 'query',
+        # 'scope': 'email profile',
+        'prompt': 'login'
+    }
 )
