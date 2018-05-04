@@ -24,12 +24,14 @@ pipeline {
                                    // generate version, it's important to remove the trailing new line in git describe output
                                    def version = sh script: 'git rev-parse --short HEAD | tr -d "\n"', returnStdout: true
                                    def imageName = "icokpy"
-                                   def acrUrl = 'https://icokpy.azurecr.io'
+                                   def imageTag = "${env.BUILD_NUMBER}_${version}"
+                                   def acrHost = 'icokpy.azurecr.io'
+                                   def acrUrl = "https://${acrHost}"
                                    def location = 'westeurope'
                                    def webAppName = 'icokpy'
                                    def webAppResourceGroup = "icokpy-dev-${location}"
 
-                                   def okImage = docker.build("${imageName}:${env.BUILD_NUMBER}_${version}")
+                               def okImage = docker.build("${imageName}:${imageTag}")
 
                                    okImage.inside() {
                                         sh 'py.test tests/ --ignore=tests/test_job.py'
@@ -57,14 +59,30 @@ pipeline {
                                              withCredentials([usernamePassword(credentialsId: 'icokpy-mysql-credentials', usernameVariable: 'mysqlUser', passwordVariable: 'mysqlPass')]) {
                                                withCredentials([usernamePassword(credentialsId: 'icokpy-sendgrid', usernameVariable: 'sendgridUser', passwordVariable: 'sendgridPass')]) {
                                                  withCredentials([usernamePassword(credentialsId: 'icokpy-registry-credentials', usernameVariable: 'acrUser', passwordVariable: 'acrPass')]) {
-                                                   sh """
-                                                     az group deployment create --resource-group ${webAppResourceGroup} --template-file azure/paas/azure.deploy.json \
-                                                       --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName}:${version} \
-                                                       --parameters mySqlUsername=${mysqlUser} --parameters mySqlAdminPassword=${mysqlPass} \
-                                                       --parameters sendgridAccountName=${sendgridUser} --parameters sendgridPassword=${sendgridPass} \
-                                                       --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
-                                                       --parameters dockerRegistryUrl=$acrUrl --parameter appName='icokpy-dev'
-                                                   """
+                                                   withCredentials([usernamePassword(credentialsId: 'icokpy-azure-app-id', usernameVariable: 'azureAdAppID', passwordVariable: 'azureAdAppSecret')]) {
+                                                     // Horrible hack - the first deployment is expected to fail with resources not yet available. so we need to
+                                                     // re-run if the first deployment fails.
+                                                     sh """
+                                                       az group deployment create --resource-group ${webAppResourceGroup} --template-file azure/paas/azure.deploy.json \
+                                                         --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName} \
+                                                         --parameters dockerImageTag=${imageTag} --parameters mySqlUsername=${mysqlUser}  \
+                                                         --parameters mySqlAdminPassword=${mysqlPass} --parameters sendgridPassword=${sendgridPass} \
+                                                         --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
+                                                         --parameters dockerRegistryUrl=${acrHost} --parameter uniqueAppName='icokpy-dev' --parameter OkPyEnvironment='dev' \
+                                                         --parameters templateBaseURL=https://raw.githubusercontent.com/icokpy/ok/master/azure/paas/ \
+                                                         --parameters azureAdAppID=${azureAdAppID} --parameters azureAdAppSecret=${azureAdAppSecret} \
+                                                         --parameters azureAdTenantID='ImperialLondon.onmicrosoft.com' || \
+                                                       az group deployment create --resource-group ${webAppResourceGroup} --template-file azure/paas/azure.deploy.json \
+                                                         --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName} \
+                                                         --parameters dockerImageTag=${imageTag} --parameters mySqlUsername=${mysqlUser}  \
+                                                         --parameters mySqlAdminPassword=${mysqlPass} --parameters sendgridPassword=${sendgridPass} \
+                                                         --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
+                                                         --parameters dockerRegistryUrl=${acrHost} --parameter uniqueAppName='icokpy-dev' --parameter OkPyEnvironment='dev' \
+                                                         --parameters templateBaseURL=https://raw.githubusercontent.com/icokpy/ok/master/azure/paas/ \
+                                                         --parameters azureAdAppID=${azureAdAppID} --parameters azureAdAppSecret=${azureAdAppSecret} \
+                                                         --parameters azureAdTenantID='ImperialLondon.onmicrosoft.com'
+                                                       """
+                                                   }
                                                  }
                                                }
                                              }
