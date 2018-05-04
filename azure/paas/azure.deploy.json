@@ -106,6 +106,15 @@
           "description": "Sendgrid password"
         }
       },
+      
+      "sendgridAccountName": {
+        "type": "securestring",
+        "minLength": 1,
+        "metadata": {
+          "description": "Sendgrid Account Name"
+        }
+      },
+        
       "templateBaseURL": {
         "type": "string",
         "defaultValue": "https://raw.githubusercontent.com/Cal-CS-61A-Staff/ok/enhancement/icokpy/azure-deploy/azure/paas/",
@@ -116,8 +125,7 @@
     },
     "variables": {
       "mySQLServerName": "[concat('mysql',parameters('uniqueAppName'))]",
-      "secretKey":"[uniqueString('mySqlAdminPassword')]",
-      "sendgridAccountName": "[concat('sendgrid',parameters('uniqueAppName'))]"
+      "secretKey":"[uniqueString('mySqlAdminPassword')]"
       
     },
     "resources": [
@@ -174,33 +182,7 @@
         }
   
       },
-      {
-        "name": "sendgrid",
-        "type": "Microsoft.Resources/deployments",
-        "apiVersion": "2016-09-01",
-        "dependsOn": [
-       
-  
-        ],
-        "properties": {
-          "mode": "Incremental",
-          "templateLink": {
-            "uri": "[concat(parameters('templateBaseURL'),'sendgrid.deploy.json')]",
-       
-            "contentVersion": "1.0.0.0"
-          },
-          "parameters": {
-            "sendgridAccountName":{
-              "value": "[variables('sendgridAccountName')]"
-            },
-            "sendgridPassword": {
-              "value": "[parameters('sendgridPassword')]"
-            }
-  
-          }
-        }
-  
-      },
+        
       {
         "name": "aci-create-container",
         "type": "Microsoft.Resources/deployments",
@@ -352,7 +334,6 @@
           "[concat('Microsoft.Resources/deployments/', 'MySQL')]",
           "[concat('Microsoft.Resources/deployments/', 'redis')]",
           "[concat('Microsoft.Resources/deployments/', 'storage')]",
-          "[concat('Microsoft.Resources/deployments/', 'sendgrid')]",
           "[concat('Microsoft.Resources/deployments/', 'AppInsights')]",
           "[concat('Microsoft.Resources/deployments/', 'aci-create-container')]"
         ],
@@ -427,6 +408,10 @@
             "sendgridPassword": {
               
               "value":  "[parameters('sendgridPassword')]"
+            },
+            "sendgridAccountName": {
+              
+              "value":  "[parameters('sendgridAccountName')]"
             },
             "applicationInsightsKey":{
 
