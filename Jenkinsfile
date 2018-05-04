@@ -64,18 +64,18 @@ pipeline {
                                                      // the error exit state and force clean exit with '|| true'
                                                      sh """
                                                        az group deployment create --resource-group ${webAppResourceGroup} --template-file azure/paas/azure.deploy.json \
-                                                         --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName}:${imageTag} \
-                                                         --parameters mySqlUsername=${mysqlUser} --parameters mySqlAdminPassword=${mysqlPass} \
-                                                         --parameters sendgridPassword=${sendgridPass} \
+                                                         --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName} \
+                                                         --parameters dockerImageTag=${imageTag} --parameters mySqlUsername=${mysqlUser}  \
+                                                         --parameters mySqlAdminPassword=${mysqlPass} --parameters sendgridPassword=${sendgridPass} \
                                                          --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
                                                          --parameters dockerRegistryUrl=${acrHost} --parameter uniqueAppName='icokpy-dev' --parameter OkPyEnvironment='dev' \
                                                          --parameters templateBaseURL=https://raw.githubusercontent.com/icokpy/ok/master/azure/paas/ \
                                                          --parameters azureAdAppID=${azureAdAppID} --parameters azureAdAppSecret=${azureAdAppSecret} \
                                                          --parameters azureAdTenantID='ImperialLondon.onmicrosoft.com' || true
                                                        az group deployment create --resource-group ${webAppResourceGroup} --template-file azure/paas/azure.deploy.json \
-                                                         --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName}:${imageTag} \
-                                                         --parameters mySqlUsername=${mysqlUser} --parameters mySqlAdminPassword=${mysqlPass} \
-                                                         --parameters sendgridPassword=${sendgridPass} \
+                                                         --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName} \
+                                                         --parameters dockerImageTag=${imageTag} --parameters mySqlUsername=${mysqlUser}  \
+                                                         --parameters mySqlAdminPassword=${mysqlPass} --parameters sendgridPassword=${sendgridPass} \
                                                          --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
                                                          --parameters dockerRegistryUrl=${acrHost} --parameter uniqueAppName='icokpy-dev' --parameter OkPyEnvironment='dev' \
                                                          --parameters templateBaseURL=https://raw.githubusercontent.com/icokpy/ok/master/azure/paas/ \
