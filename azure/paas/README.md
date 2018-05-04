@@ -6,7 +6,7 @@ These templates deploy [Ok.py](www.okpy.org) to Azure. In a production environme
 
 The provided templates deploy everything within the Resource Group outlined below:
 
-![Azure PaaS Architecture](./img/arch.PNG)
+![Azure PaaS Architecture](./img/architecture-diagram.png)
 
 ## Accept SendGrid Terms and Conditions
 
