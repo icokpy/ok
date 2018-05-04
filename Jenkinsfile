@@ -24,12 +24,13 @@ pipeline {
                                    // generate version, it's important to remove the trailing new line in git describe output
                                    def version = sh script: 'git rev-parse --short HEAD | tr -d "\n"', returnStdout: true
                                    def imageName = "icokpy"
+                                   def imageTag = "${env.BUILD_NUMBER}_${version}"
                                    def acrUrl = 'https://icokpy.azurecr.io'
                                    def location = 'westeurope'
                                    def webAppName = 'icokpy'
                                    def webAppResourceGroup = "icokpy-dev-${location}"
 
-                                   def okImage = docker.build("${imageName}:${env.BUILD_NUMBER}_${version}")
+                               def okImage = docker.build("${imageName}:${imageTag}")
 
                                    okImage.inside() {
                                         sh 'py.test tests/ --ignore=tests/test_job.py'
@@ -59,11 +60,13 @@ pipeline {
                                                  withCredentials([usernamePassword(credentialsId: 'icokpy-registry-credentials', usernameVariable: 'acrUser', passwordVariable: 'acrPass')]) {
                                                    sh """
                                                      az group deployment create --resource-group ${webAppResourceGroup} --template-file azure/paas/azure.deploy.json \
-                                                       --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName}:${version} \
+                                                       --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName}:${imageTag} \
                                                        --parameters mySqlUsername=${mysqlUser} --parameters mySqlAdminPassword=${mysqlPass} \
                                                        --parameters sendgridAccountName=${sendgridUser} --parameters sendgridPassword=${sendgridPass} \
                                                        --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
-                                                       --parameters dockerRegistryUrl=$acrUrl --parameter appName='icokpy-dev'
+                                                       --parameters dockerRegistryUrl=$acrUrl --parameter appName='icokpy-dev' --parameter ok_env='dev' \
+                                                       --parameters templateBaseURL=https://raw.githubusercontent.com/icokpy/ok/master/azure/paas/
+                                                      
                                                    """
                                                  }
                                                }
