@@ -7,7 +7,7 @@ These templates deploy Ok.py to Azure. In a production environment you may wish 
 
 ## Architecture
 
-![Azure PaaS Architecture](./img/arch.PNG)
+![Azure PaaS Architecture](./img/architecture-diagram.png)
 
 
 ## Accept SendGrid Terms
