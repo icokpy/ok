@@ -27,6 +27,7 @@ pipeline {
                                    def acrUrl = 'https://icokpy.azurecr.io'
                                    def webAppResourceGroup = 'icokpy-deployment'
                                    def webAppName = 'icokpy'
+                                   def location = 'westeurope'
 
                                    def okImage = docker.build("${imageName}:${env.BUILD_NUMBER}_${version}")
 
@@ -52,7 +53,7 @@ pipeline {
                                         withCredentials([azureServicePrincipal('jenkins-service-principal')]) {
                                              sh "az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID"
                                              sh "az account set -s $AZURE_SUBSCRIPTION_ID"
-                                             sh "az group create --name ${webAppResourceGroup} --location 'UK South'"
+                                             sh "az group create --name ${webAppResourceGroup}-${location} --location ${location}"
                                              withCredentials([usernamePassword(credentialsId: 'icokpy-mysql-credentials', usernameVariable: 'mysqlUser', passwordVariable: 'mysqlPass')]) {
                                                withCredentials([usernamePassword(credentialsId: 'icokpy-sendgrid', usernameVariable: 'sendgridUser', passwordVariable: 'sendgridPass')]) {
                                                  withCredentials([usernamePassword(credentialsId: 'icokpy-registry-credentials', usernameVariable: 'acrUser', passwordVariable: 'acrPass')]) {
