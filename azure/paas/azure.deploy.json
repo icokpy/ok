@@ -2,6 +2,14 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+          
+      "uniqueAppName": {
+        "type": "string",
+        "minLength": 1,
+        "metadata": {
+          "description": "Application name, used in URLs, must be unique across Azure"
+        }
+      },
       "OkPyEnvironment": {
         "type": "string",
         "defaultValue": "dev",
@@ -98,14 +106,6 @@
           "description": "Sendgrid password"
         }
       },
-      
-      "uniqueAppName": {
-        "type": "string",
-        "minLength": 1,
-        "metadata": {
-          "description": "Application name, used in URLs, must be unique across Azure"
-        }
-      },
       "templateBaseURL": {
         "type": "string",
         "defaultValue": "https://raw.githubusercontent.com/Cal-CS-61A-Staff/ok/enhancement/icokpy/azure-deploy/azure/paas/",
@@ -114,12 +114,12 @@
         }
       }
     },
-  "variables": {
-    "mySQLServerName": "[concat('mysql',parameters('uniqueAppName'))]",
-    "secretKey":"[uniqueString('mySqlAdminPassword')]",
-    "sendgridAccountName": "[concat('sendgrid',parameters('uniqueAppName'))]"
-    
-  },
+    "variables": {
+      "mySQLServerName": "[concat('mysql',parameters('uniqueAppName'))]",
+      "secretKey":"[uniqueString('mySqlAdminPassword')]",
+      "sendgridAccountName": "[concat('sendgrid',parameters('uniqueAppName'))]"
+      
+    },
     "resources": [
       
       {

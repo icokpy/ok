@@ -2,59 +2,57 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "appName": {
-        "value":"mrokpy"
+      "uniqueAppName": {
+        "value":"<UNIQUE_ID>"
       }, 
-      "ok_env": {
+      "OkPyEnvironment": {
         "value": "simple"
       },      
+      "dockerRegistryUrl":{
+
+        "value":"quay.io"
+      },
+
+      "dockerRegistryUsername":{
+
+        "value":""
+      },
+      "dockerRegistryPassword":{
+
+        "value":""
+      },
+
+      "dockerImageName":{
+
+        "value":"cs61a/ok-server"
+      },
+      "dockerImageTag":{
+
+        "value":"latest"
+      },
+      "azureAdAppID":{
+        "value": ""
+      },
+      "azureAdAppSecret":{
+
+        "value": ""
+      }, 
+      "azureAdTenantID":{
+
+        "value": ""
+      },
       "mySqlUsername": {
-           "value":"adminmarcus"
-        },
-          "mySqlAdminPassword": {
-            "value":"Password1234"
-          },
-                "sendgridAccountName": {
-            "value":"mrsendgrid"
-          },
-          "sendgridPassword": {
-            "value":"Password1234"
-          },
-          "templateBaseURL": {
+           "value":"admin"
+      },
+      "mySqlAdminPassword": {
+            "value":"<PASSWORD>"
+      },
+      "sendgridPassword": {
+            "value":"<PASSWORD>"
+      },
+      "templateBaseURL": {
             "value":"https://raw.githubusercontent.com/icokpy/ok/enhancement/icokpy/azure-tempaltes/azure/paas/"
-          },
-          "dockerRegistryUsername":{
-
-            "value":"icokpy"
-          },
-          "dockerRegistryPassword":{
-
-            "value":""
-          },
-          "dockerRegistryUrl":{
-
-            "value":"icokpy.azurecr.io"
-          },
-          "dockerImageName":{
-
-            "value":""
-          },
-          "dockerImageTag":{
-
-            "value":"oauth"
-          },
-          "azureAdAppID":{
-            "value": ""
-          },
-          "azureAdAppSecret":{
-
-            "value": ""
-          },
-            "SecretKey":{
-              "value":""
-                  
-            }
-         
+      }
     }
   }
 
