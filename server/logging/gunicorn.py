@@ -128,5 +128,5 @@ class Logger(gunicorn.glogging.Logger):
         self.cloud_logger.log_proto(struct_pb, severity=severity)
 
 
-if os.getenv('APPLICATION_INSIGHTS_KEY'):
+if os.getenv('APPINSIGHTS_INSTRUMENTATIONKEY'):
     Logger = gunicorn.glogging.Logger

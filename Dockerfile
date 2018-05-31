@@ -6,12 +6,13 @@ RUN mkdir /code/
 WORKDIR /code/
 
 ADD requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 --timeout=60 install --no-cache-dir -r requirements.txt
 
 ADD . .
 
-RUN mv docker/nginx/nginx.conf /etc/nginx/nginx.conf
-RUN mv docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+RUN mv docker/nginx/nginx.conf /etc/nginx/nginx.conf && \
+    mv docker/nginx/default.conf /etc/nginx/conf.d/default.conf && \
+    mv docker/wait-for /wait-for
 
 RUN ./manage.py assets build
 

@@ -39,16 +39,14 @@ https://github.com/jmspring/libcloud/archive/issue_933_azure_crash_v2.3.0-base.z
 # OAuth
 
 oauthlib==2.0.2
-# Flask-OAuthlib==0.9.3
-# OAuthlib version that logs errors - use until Flask-OAuthlib > 0.9.3 is published
-https://github.com/lepture/flask-oauthlib/archive/d62bf665fa2a4ab71327cd665334fdec25ade116.zip
-
-pyjwt==1.6.1
+Flask-OAuthlib==0.9.4
 
 Flask-WTF==0.14.2
 Flask-RESTful==0.3.5
 Flask-Testing>=0.5.0,<1.0
 Flask-RQ==0.2
+
+pyjwt==1.6.1
 
 # Flask DB Extensions
 # Flask-SQLAlchemy==2.2
@@ -83,8 +81,7 @@ bleach==2.0.0
 gcloud==0.18.3
 
 # Azure logging
-# until https://github.com/Microsoft/ApplicationInsights-Python/pull/79 is merged and released
-https://github.com/c-w/ApplicationInsights-Python/archive/flask-integration.zip
+applicationinsights==0.11.3
 
 # Azure Storage
 azure-storage-blob==1.1.0

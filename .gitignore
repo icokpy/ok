@@ -46,4 +46,5 @@ database.db
 *.db
 *.db-journal
 
-**/.vscode/**
+# Visual Studio Code
+.vscode

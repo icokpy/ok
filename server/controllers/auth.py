@@ -1,13 +1,12 @@
 """
 There are two ways to authenticate a request:
 * Present the session cookie returned after logging in
-* Send a Google access token as the access_token query parameter
+* Send an access token as the access_token query parameter to the chosen service provider
 """
 import jwt
 
 from flask import (abort, Blueprint, current_app, flash, redirect,
                    render_template, request, session, url_for, jsonify)
-
 from flask_oauthlib.client import OAuth, OAuthException
 from flask_oauthlib.contrib.oauth2 import bind_sqlalchemy
 
@@ -21,10 +20,12 @@ import logging
 from server import utils
 from server.models import db, User, Enrollment, Client, Token, Grant
 from server.extensions import csrf, oauth_provider, cache
+from server.constants import GOOGLE, MICROSOFT
 
 logger = logging.getLogger(__name__)
 
 auth = Blueprint('auth', __name__)
+
 auth.config = {}
 
 provider_auth = None
@@ -41,14 +42,15 @@ def record_params(setup_state):
     global oauth
     oauth = OAuth()
     app = setup_state.app
-    provider_name = app.config.get('OAUTH_PROVIDER', 'GOOGLE')
+    provider_name = app.config.get('OAUTH_PROVIDER', GOOGLE)
     provider_auth = oauth.remote_app(
         provider_name, 
-        app_key=provider_name # TODO: None fail check.
+        app_key=provider_name
     )
-    provider_auth._tokengetter = provider_token
+    
     oauth.init_app(app)
-    #instead of decorator set the fn pointer to the func here
+    #instead of decorator set the fn pointer to the func here:
+    provider_auth._tokengetter = provider_token
    
 def provider_token(token=None):
     return session.get('provider_token')
@@ -119,27 +121,40 @@ def google_user_data(token, timeout=5):
     return None
 
 def microsoft_user_data(token):
+    """ Query Microsoft for a user's info. """
     if not token:
         logger.info("Microsoft Token is None")
         return None
 
     try:
         decoded_token = jwt.decode(token, verify=False)
-        if 'unique_name' in decoded_token: # Azure V1 endpoints
+        if 'unique_name' in decoded_token: # azure ad unique id
+            logger.info("token found in Azure unique_name value")
             return {'email': decoded_token['unique_name']} 
-        if 'preferred_username' in decoded_token:  # Azure V2 endpoints
-            return {'email': decoded_token['preferred_username']}
+        if 'upn' in decoded_token:  # fallback to upn
+            logger.info("token found in Azure upn value")
+            return {'email': decoded_token['upn']}
 
-        logger.error("Unable to retreive unique_name from token - which is email")
+        # reading from the Token didn't work - now we try a MS Graph Call.
+        logger.warning("token had no values and MS Graph WILL be called")
+        headers = {'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + token}
+        r = requests.get(current_app.config.get(provider_name)['base_url'] + '/me', headers=headers)
+        ms_graph_me = r.json()
+        if 'userPrincipalName' in ms_graph_me:
+            logger.warning("token had no values and MS Graph call made!")
+            return { 'email': ms_graph_me['userPrincipalName']}
+
+        logger.error("Unable to retrieve unique_name (the user's email) from token")
         return None
     except jwt.DecodeError as e:
-        logger.error("jwt Decode error from token")
+        logger.error("jwt decode error from token")
         logger.error('Decode error was %s', e)
         return None
 
 def user_from_provider_token(token):
     """
-    Get a User with the given Google access token, or create one if no User with
+    Get a User with the given access token, or create one if no User with
     this email is found. If the token is invalid, return None.
     """
     if not token:
@@ -147,20 +162,17 @@ def user_from_provider_token(token):
     if use_testing_login() and token == "test":
         return user_from_email("okstaff@okpy.org")
 
-    # TODO: externalize these strings and genericize
-    if provider_name == 'GOOGLE':
+    if provider_name == GOOGLE:
         user_data = google_user_data(token)
-    elif provider_name == 'MICROSOFT':
+    elif provider_name == MICROSOFT:
         user_data = microsoft_user_data(token)
 
-    # TODO: fixup
     if not user_data or 'email' not in user_data:
-        cache.delete_memoized(google_user_data, token)
-        logger.warning("Could not login with oauth. Trying again - {}".format(user_data))
-        user_data = google_user_data(token, timeout=10)
+        if provider_name == GOOGLE:
+            cache.delete_memoized(google_user_data, token)
+        elif provider_name == MICROSOFT:
+            cache.delete_memoized(microsoft_user_data, token)
 
-    if not user_data or 'email' not in user_data:
-        cache.delete_memoized(google_user_data, token)
         logger.warning("Auth Retry failed for token {} - {}".format(token, user_data))
         return None
 
@@ -192,7 +204,7 @@ def unauthorized():
 
 def authorize_user(user):
     if user is None:
-        logger.error("Google Auth Failure - attempting to authorize None user")
+        logger.error("Auth Failure - attempting to authorize None user")
         raise TypeError("Cannot login as None")
     login_user(user)
     after_login = session.pop('after_login', None)
@@ -200,7 +212,7 @@ def authorize_user(user):
 
 def use_testing_login():
     """
-    Return True if we use the unsecure testing login instead of Google OAuth.
+    Return True if we use the unsecure testing login instead of service provider OAuth.
     Requires TESTING_LOGIN = True in the config and the environment is not prod.
     """
     return (current_app.config.get('TESTING_LOGIN', False) and
@@ -222,7 +234,7 @@ def csrf_check():
 @auth.route("/login/")
 def login():
     """
-    Authenticates a user with an access token using Google APIs.
+    Authenticates a user with an access token using service provider APIs.
     """
     if use_testing_login():
         return redirect(url_for('.testing_login'))
@@ -256,17 +268,10 @@ def authorized():
         return redirect("/")
 
     logger.info("Login from {}".format(user.email))
-    expires_in = safe_cast(resp.get('expires_in'), int, 0)
+    expires_in = utils.safe_cast(resp.get('expires_in'), int, 0)
     session['token_expiry'] = dt.datetime.now() + dt.timedelta(seconds=expires_in)
     session['provider_token'] = (access_token, '')  # (access_token, secret)
     return authorize_user(user)
-
-
-def safe_cast(val, to_type, default=None):
-    try:
-        return to_type(val)
-    except (ValueError, TypeError):
-        return default
 
 ################
 # Other Routes #
@@ -287,7 +292,7 @@ def sudo_login(email):
     return authorize_user(user)
 
 # Backdoor log in if you want to impersonate a user.
-# Will not give you a Google auth token.
+# Will not give you a service provider auth token.
 # Requires that TESTING_LOGIN = True in the config and we must not be running in prod.
 @auth.route('/testing-login/')
 def testing_login():

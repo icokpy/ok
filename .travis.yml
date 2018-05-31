@@ -6,24 +6,22 @@ services:
   - docker
   - redis
 python:
-  - '3.5'
+    - "3.5"
 env:
   global:
-    - OK_ENV=test
+     - OK_ENV=test
   matrix:
-    - SETUP=docker
-    - SETUP=native
-    - SETUP=native
-      DB_ROW_FORMAT=default
+    - USE_DOCKER=1
+    - USE_NATIVE=1
 install:
-  - if [ "$SETUP" = "docker" ]; then make docker-build; fi
-  - if [ "$SETUP" = "native" ]; then pip install -r requirements.txt; fi
-  - if [ "$SETUP" = "native" ]; then pip install pytest-timeout python-coveralls; fi
+  - if [ -n "$USE_DOCKER" ]; then travis_retry make docker-build; fi
+  - if [ -n "$USE_NATIVE" ]; then travis_retry pip --timeout=60 install -r requirements.txt; fi
+  - if [ -n "$USE_NATIVE" ]; then travis_retry pip --timeout=60 install pytest-timeout python-coveralls; fi
 script:
-  - if [ "$SETUP" = "docker" ]; then docker run -it cs61a/ok-server py.test tests/; fi
-  - if [ "$SETUP" = "native" ]; then py.test -sv --cov-report term-missing --cov=server tests/  --ignore tests/test_web.py --timeout=30; fi
+  - if [ -n "$USE_DOCKER" ]; then make docker-test; fi
+  - if [ -n "$USE_NATIVE" ]; then py.test --cov-report term-missing --cov=server tests/  --ignore tests/test_web.py --timeout=30; fi
 after_success:
-  - if [ "$SETUP" = "native" ]; then echo "eventually should run coveralls here"; fi
+  - if [ -n "$USE_NATIVE" ]; then echo "eventually should run coveralls here"; fi
 notifications:
   email: false
   slack:
