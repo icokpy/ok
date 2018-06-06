@@ -59,13 +59,13 @@
  
    },
     "variables":{  
-        
+      "serverName": "[toLower(parameters('mySqlServerName'))]"
     },
    "resources": [
      {
        "apiVersion": "2017-12-01",
        "location": "[resourceGroup().location]",
-       "name": "[parameters('mySqlServerName')]",
+       "name": "[variables('serverName')]",
        "properties": {
          "version": "[parameters('version')]",
          "administratorLogin": "[parameters('mySqlUsername')]",
@@ -92,10 +92,10 @@
            "type": "firewallrules",
            "apiVersion": "2017-12-01",
            "dependsOn": [
-             "[concat('Microsoft.DBforMySQL/servers/', parameters('mySqlServerName'))]"
+             "[concat('Microsoft.DBforMySQL/servers/', variables('serverName'))]"
            ],
            "location": "[resourceGroup().location]",
-           "name": "[concat(parameters('mySqlServerName'),'firewall')]",
+           "name": "[concat(variables('serverName'),'firewall')]",
            "properties": {
              "startIpAddress": "0.0.0.0",
              "endIpAddress": "255.255.255.255"
@@ -110,7 +110,7 @@
              "collation": "utf8_general_ci"
            },
            "dependsOn": [
-             "[concat('Microsoft.DBforMySQL/servers/', parameters('mySqlServerName'))]"
+             "[concat('Microsoft.DBforMySQL/servers/', variables('serverName'))]"
            ]
          }
        ]
@@ -118,7 +118,7 @@
    ],
    "outputs": {
      "mySqlFQDN": {
-       "value": "[reference(resourceId('Microsoft.DBforMySQL/servers',parameters('mySqlServerName'))).fullyQualifiedDomainName]",
+       "value": "[reference(resourceId('Microsoft.DBforMySQL/servers',variables('serverName'))).fullyQualifiedDomainName]",
        "type": "string"
      }
  

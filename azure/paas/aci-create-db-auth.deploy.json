@@ -6,6 +6,14 @@
             "defaultValue": "quay.io",
             "type": "string"
           },
+          "dockerRegistryUsername":{
+            
+            "type": "string"
+          },
+          "dockerRegistryPassword":{
+           
+            "type": "string"
+          },
           "dockerImageName":{
             "defaultValue": "cs61a/ok-server",
             "type": "string"
@@ -44,6 +52,13 @@
     "properties": {
       "osType":"Linux", 
       "restartPolicy": "Never",
+      "imageRegistryCredentials": [
+        {
+          "server": "[parameters('dockerRegistryUrl')]",
+          "username": "[parameters('dockerRegistryUsername')]",
+          "password": "[parameters('dockerRegistryPassword')]"
+        }
+      ],
       "containers": [
         {
           "name": "[concat('create-db', uniquestring(resourceGroup().id))]",

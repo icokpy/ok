@@ -25,9 +25,13 @@
         }
     ] ,
     "outputs": {
+        "rediskey": {
+            "type": "string",
+            "value": "[listkeys(resourceId('Microsoft.Cache/redis', variables('redisName')), '2017-02-01').primaryKey]"
+        },
         "redis": {
             "type": "object",
-            "value": "[reference(resourceId('Microsoft.Cache/Redis', variables('redisName')))]"
+            "value": "[reference(variables('redisName'))]"
         }
       }
 }

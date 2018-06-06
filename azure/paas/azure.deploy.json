@@ -70,7 +70,7 @@
       },
       "azureAdAppSecret":{
         "defaultValue":"",
-        "type": "string",
+        "type": "securestring",
         "metadata": {
           "description": "Requried to integrate with Azure AD for user access"
         }
@@ -108,7 +108,7 @@
       },
       "templateBaseURL": {
         "type": "string",
-        "defaultValue": "https://raw.githubusercontent.com/Cal-CS-61A-Staff/ok/enhancement/icokpy/azure-deploy/azure/paas/",
+        "defaultValue": "https://raw.githubusercontent.com/icokpy/ok/enhancement/icokpy/azure-templates/azure/paas/",
         "metadata": {
           "description": "Repo base URL"
         }
@@ -237,6 +237,7 @@
   
       },
       {
+        "condition": "[equals(parameters('dockerRegistryPassword'),'')]",
         "name": "aci-create-db",
         "type": "Microsoft.Resources/deployments",
         "apiVersion": "2016-09-01",
@@ -250,6 +251,59 @@
           "mode": "Incremental",
           "templateLink": {
             "uri": "[concat(parameters('templateBaseURL'),'aci-create-db.deploy.json')]",
+       
+            "contentVersion": "1.0.0.0"
+          },
+        
+          "parameters": {
+           
+
+            "dockerRegistryUrl":{
+
+              "value": "[parameters('dockerRegistryUrl')]"
+            },
+            "dockerImageName":{
+      
+              "value": "[parameters('dockerImageName')]"
+            },
+            "dockerImageTag":{
+      
+              "value": "[parameters('dockerImageTag')]"
+            },
+            "mysqlUsername": {
+              "value": "[parameters('mySqlUsername')]"
+              
+            },
+            "mysqlPassword": {
+              "value": "[parameters('mySQlAdminPassword')]"
+              
+            },
+            "mySQLServerName": {
+              "value": "[variables('mySQLServerName')]"
+    
+            }
+
+  
+          }
+        }
+  
+      },
+
+      {
+        "condition": "[not(equals(parameters('dockerRegistryPassword'),''))]",
+        "name": "aci-create-db-auth",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2016-09-01",
+        "dependsOn": [
+       
+ 
+            "[concat('Microsoft.Resources/deployments/', 'mysql')]"
+  
+          ],
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[concat(parameters('templateBaseURL'),'aci-create-db-auth.deploy.json')]",
        
             "contentVersion": "1.0.0.0"
           },
@@ -411,15 +465,10 @@
               "value": "[variables('mySQLServerName')]"
     
             },
-            "redisFQDN": {
-              "value": "[reference('redis').outputs.redis.value.hostName]"
+            "redisURL": {
+              "value": "[concat('rediss://:',reference('redis').outputs.rediskey.value,'@',reference('redis').outputs.redis.value.hostName,':6380','/0')]"
               
           },
-          "redisPassword": {
-            "value": "[reference('redis').outputs.redis.value.accessKeys.primarykey]"
-            
-                
-            },
             "sendgridAccountName": {
               
               "value":  "[reference('SendGrid').outputs.SendGrid.value.username]"
@@ -526,16 +575,11 @@
               "value": "[variables('mySQLServerName')]"
     
             },
-            "redisFQDN": {
-              "value": "[reference('redis').outputs.redis.value.hostName]"
+            "redisURL": {
+              "value": "[concat('rediss://:',reference('redis').outputs.rediskey.value,'@',reference('redis').outputs.redis.value.hostName,'6380','/0')]"
               
           },
-          "redisPassword": {
-            "value": "[reference('redis').outputs.redis.value.accessKeys.primarykey]"
-            
-                
-            },
-                       "sendgridAccountName": {
+          "sendgridAccountName": {
               
               "value":  "[reference('SendGrid').outputs.SendGrid.value.username]"
             },

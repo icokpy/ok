@@ -1,3 +1,0 @@
-az group create -n <RG_Name> -l <location>
-
-az group deployment create -g <RG_Name> --template-file azure.deploy.json --parameters @'azure.deploy.parameters.json'

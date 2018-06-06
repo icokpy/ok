@@ -16,6 +16,12 @@ MICROSOFT_APP_SECRET={ActiveDirectoryAppSecret}
 MICROSOFT_APP_ID={ActiveDirectoryAppId}
 ```
 
+To create and App registration follow this guide: [https://docs.microsoft.com/en-gb/azure/active-directory/develop/active-directory-integrating-applications](https://docs.microsoft.com/en-gb/azure/active-directory/develop/active-directory-integrating-applications)
+
+The App registration reply URL needs to be set to: ```http(s)://<FQDN>/login/authorized/```
+
+Your Azure AD administrator may have to grant consent to the application as per: [https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-devhowto-multi-tenant-overview#understanding-user-and-admin-consent](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-devhowto-multi-tenant-overview#understanding-user-and-admin-consent)
+
 ## Azure Database for MySQL
 
 The [Azure MySQL database](https://azure.microsoft.com/en-us/services/mysql/) can be enabled by setting the following
@@ -46,6 +52,8 @@ environment variables:
 ```
 REDIS_URL=rediss://:{Password}@{CacheName}.redis.cache.windows.net:6380/0
 ```
+
+Please node this issue which may require manual regeneration of the Redis key: [https://github.com/Cal-CS-61A-Staff/ok/issues/1279](https://github.com/Cal-CS-61A-Staff/ok/issues/1279)
 
 ## Azure Application Insights
 

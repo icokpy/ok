@@ -51,7 +51,7 @@
             "value":"<PASSWORD>"
       },
       "templateBaseURL": {
-            "value":"https://raw.githubusercontent.com/icokpy/ok/enhancement/icokpy/azure-tempaltes/azure/paas/"
+            "value":"https://raw.githubusercontent.com/Cal-CS-61A-Staff/ok/master/azure/paas/"
       }
     }
   }
