@@ -47,6 +47,9 @@
       "mySqlAdminPassword": {
             "value":"<PASSWORD>"
       },
+      "sendgridAccountName": {
+            "value":"<ACCOUNTNAME>"
+      },
       "sendgridPassword": {
             "value":"<PASSWORD>"
       },
