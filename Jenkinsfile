@@ -57,7 +57,7 @@ pipeline {
                                              sh "az account set -s $AZURE_SUBSCRIPTION_ID"
                                              sh "az group create --name ${webAppResourceGroup} --location ${location}"
                                              withCredentials([usernamePassword(credentialsId: 'icokpy-mysql-credentials', usernameVariable: 'mysqlUser', passwordVariable: 'mysqlPass')]) {
-                                               withCredentials([usernamePassword(credentialsId: 'icokpy-sendgrid', usernameVariable: 'sendgridUser', passwordVariable: 'sendgridPass')]) {
+                                               withCredentials([usernamePassword(credentialsId: 'icokpy-sendgrid', usernameVariable: 'sendgridAccountName', passwordVariable: 'sendgridPass')]) {
                                                  withCredentials([usernamePassword(credentialsId: 'icokpy-registry-credentials', usernameVariable: 'acrUser', passwordVariable: 'acrPass')]) {
                                                    withCredentials([usernamePassword(credentialsId: 'icokpy-azure-app-id', usernameVariable: 'azureAdAppID', passwordVariable: 'azureAdAppSecret')]) {
                                                      // Horrible hack - the first deployment is expected to fail with resources not yet available. so we need to
@@ -67,6 +67,7 @@ pipeline {
                                                          --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName} \
                                                          --parameters dockerImageTag=${imageTag} --parameters mySqlUsername=${mysqlUser}  \
                                                          --parameters mySqlAdminPassword=${mysqlPass} --parameters sendgridPassword=${sendgridPass} \
+                                                         --parameters sendgridAccountName=${sendgridAccountName} \
                                                          --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
                                                          --parameters dockerRegistryUrl=${acrHost} --parameter uniqueAppName='icokpy-dev' --parameter OkPyEnvironment='dev' \
                                                          --parameters templateBaseURL=https://raw.githubusercontent.com/icokpy/ok/master/azure/paas/ \
@@ -76,6 +77,7 @@ pipeline {
                                                          --parameters @azure/paas/azure.deploy.parameters.json --parameters dockerImageName=${imageName} \
                                                          --parameters dockerImageTag=${imageTag} --parameters mySqlUsername=${mysqlUser}  \
                                                          --parameters mySqlAdminPassword=${mysqlPass} --parameters sendgridPassword=${sendgridPass} \
+                                                         --parameters sendgridAccountName=${sendgridAccountName} \
                                                          --parameters dockerRegistryUsername=${acrUser} --parameters dockerRegistryPassword=${acrPass} \
                                                          --parameters dockerRegistryUrl=${acrHost} --parameter uniqueAppName='icokpy-dev' --parameter OkPyEnvironment='dev' \
                                                          --parameters templateBaseURL=https://raw.githubusercontent.com/icokpy/ok/master/azure/paas/ \
